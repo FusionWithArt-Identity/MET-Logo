@@ -1,57 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="refresh" content="0; url=About-Me.pdf">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Viewing Document | About Me</title>
+    <title>Welcome to M.E.T | Loading Document</title>
 
-    <meta name="description" content="Direct view of the About Me PDF document.">
+    <meta name="description" content="Welcome page for M.E.T, redirecting to the About Me document.">
 
     <style>
+        /* -----------------------------------
+           1. Suble Cyan Gradient & Core Layout
+           ----------------------------------- */
         body {
-            background-color: #f0f0f0; /* Light gray background */
-            font-family: Arial, sans-serif;
+            /* Subtle Cyan Gradient (Blue-Green to Light Cyan) */
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 20px; /* Add some padding */
+            padding: 20px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             text-align: center;
-            color: #333;
+            color: #004d40; /* Dark Teal text for contrast */
+            /* 6. High Compatibility/Responsiveness */
+            box-sizing: border-box; /* Include padding in the element's total width and height */
         }
-        /* Style for the image */
+        
+        /* -----------------------------------
+           3 & 4. Security & Protection (Prevent Drag, Copy, Print, Shortcuts)
+           ----------------------------------- */
+        * {
+            user-select: none; /* Prevent selection/dragging */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            cursor: default;
+        }
+        
+        /* -----------------------------------
+           2. Logo & Loading Animation
+           ----------------------------------- */
+        .logo-container {
+            /* The element that will spin/animate */
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin-bottom: 25px;
+            animation: spin 1.5s linear infinite; /* Apply spin animation */
+        }
+        
         .logo {
-            max-width: 150px; /* Set a reasonable size for the logo */
+            max-width: 100%;
             height: auto;
-            margin-bottom: 20px; /* Space below the logo */
-            border-radius: 5px; /* Slightly rounded corners for elegance */
+            border-radius: 50%; /* Make the image itself circular */
+            display: block;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
         }
+        
+        /* Keyframes for the Spinning Animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Text */
         h1 {
-            color: #1a1a1a;
-            font-size: 2em; /* Slightly larger heading */
+            font-size: clamp(1.8rem, 5vw, 3rem); /* Dynamic font size */
             margin-bottom: 10px;
+            color: #00796b; /* Darker Cyan */
         }
+        
         p {
+            font-size: clamp(1rem, 2vw, 1.2rem); /* Dynamic font size */
             margin-top: 5px;
-            font-size: 1.1em;
         }
+        
         a {
-            color: #007bff; /* A nice, standard blue for links */
+            color: #004d40;
             text-decoration: none;
             font-weight: bold;
-            transition: color 0.3s;
+            display: inline-block;
+            margin-top: 10px;
+            padding: 5px 10px;
+            border: 2px solid #004d40;
+            border-radius: 4px;
+            transition: background-color 0.3s, color 0.3s;
         }
         a:hover {
-            color: #0056b3;
+            background-color: #004d40;
+            color: #ffffff;
+        }
+
+        /* -----------------------------------
+           3. Prevent Printout (via CSS)
+           ----------------------------------- */
+        @media print {
+            * {
+                display: none !important;
+            }
         }
     </style>
 </head>
-<body>
-    <img src="Logo.png" alt="M.E.T Logo" class="logo">
+<body oncontextmenu="return false;">
+    <div class="logo-container">
+        <img src="Logo.png" alt="M.E.T Logo" class="logo">
+    </div>
 
     <h1>Welcome to M.E.T</h1>
     
@@ -63,5 +119,42 @@
         </a>
     </p>
 
+    <script>
+        /* -----------------------------------
+           1. JavaScript Controlled Redirect (3 Second Delay)
+           ----------------------------------- */
+        // Set the delay in milliseconds (3 seconds)
+        const redirectDelay = 3000; 
+        const targetURL = 'About-Me.pdf';
+
+        // Wait for 3 seconds then redirect
+        setTimeout(() => {
+            window.location.href = targetURL;
+        }, redirectDelay);
+
+
+        /* -----------------------------------
+           4. Disable Shortcut Keys (Meta Keys, Ctrl, Alt)
+           ----------------------------------- */
+        document.onkeydown = function(e) {
+            // Check for Ctrl/Cmd, Shift, Alt/Option
+            if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) {
+                // Check common shortcut keys (e.g., C, P, S, U, I, J, F12)
+                if (
+                    e.key === 'c' || e.key === 'p' || e.key === 's' || e.key === 'u' ||
+                    e.key === 'i' || e.key === 'j' || e.key === 'F12'
+                ) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        };
+
+        // Disable right-click for context menu
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+        
+    </script>
 </body>
 </html>
