@@ -21,21 +21,21 @@
         /* Mobile-first responsive adjustments */
         @media (max-width: 768px) and (orientation: portrait) {
             :root {
-                --logo-size: 150px; /* INCREASED from 120px */
+                --logo-size: 150px; /* INCREASEED from 120px */
                 --loader-border: 5px;
             }
         }
         
         @media (max-width: 480px) {
             :root {
-                --logo-size: 130px; /* INCREASED from 100px */
+                --logo-size: 130px; /* INCREASEED from 100px */
                 --loader-border: 4px;
             }
         }
 
         @media (max-height: 500px) and (orientation: landscape) {
             :root {
-                --logo-size: 110px; /* INCREASED from 90px */
+                --logo-size: 110px; /* INCREASEED from 90px */
             }
         }
 
@@ -112,6 +112,8 @@
             z-index: 0;
             /* Performance optimization */
             will-change: opacity;
+            /* FIX: Add transform to ensure this element is also on a stable layer */
+            transform: translateZ(-1px);
         }
 
         @keyframes pulse {
@@ -185,12 +187,12 @@
             display: flex; 
             justify-content: center;
             align-items: center;
-            z-index: 10; /* Increased z-index to ensure it sits on a robust layer */
-            /* Performance optimization - Keep the existing transform */
+            z-index: 100; /* Increased to ensure it's above everything else */
+            /* Performance optimization */
             transform: translateZ(0);
-            /* --- THE CRITICAL FIX: Isolate for better compositing during overscroll --- */
-            will-change: transform, z-index; 
-            transform-style: preserve-3d; /* New: Ensures 3D context for smooth rotation */
+            /* New: More aggressive layer promotion */
+            transform-style: preserve-3d; 
+            will-change: transform, z-index;
         }
         
         .logo {
@@ -223,14 +225,14 @@
             bottom: -12px;
             border-radius: 50%;
             box-sizing: border-box;
-            z-index: 1; 
+            z-index: 10; /* Boosted z-index */
             
             border: var(--loader-border) solid transparent;
             border-bottom-color: var(--color-secondary);
             
             animation: rotation-clockwise 1.8s linear infinite;
-            /* FIX: Removed containment, kept GPU acceleration */
-            transform: translateZ(0);
+            /* FIX: Use aggressive 3D translation to force a high-performance layer */
+            transform: translate3d(0, 0, 10px); 
             will-change: transform;
             backface-visibility: hidden;
             /* Ensure borders are fully visible */
@@ -245,39 +247,39 @@
             height: 100%;
             border-radius: 50%;
             box-sizing: border-box;
-            z-index: 1; 
+            z-index: 10; /* Boosted z-index */
             
             border: var(--loader-border) solid rgba(224, 247, 250, 0.1);
             border-top-color: var(--color-primary);
             
             animation: rotation-counterclockwise 1.2s linear infinite;
-            /* FIX: Removed containment, kept GPU acceleration */
-            transform: translateZ(0);
+            /* FIX: Use aggressive 3D translation to force a high-performance layer */
+            transform: translate3d(0, 0, 10px);
             will-change: transform;
             backface-visibility: hidden;
             /* Ensure borders are fully visible */
             overflow: visible;
         }
-
+        /* --- END OF LOADER STYLES --- */
+        /* --- FIX FOR MOBILE JANK ENDS HERE --- */
+        
         @keyframes rotation-clockwise {
             0% {
-                transform: rotate(0deg);
+                transform: rotate(0deg) translate3d(0, 0, 10px); /* Applied translate3d here too */
             }
             100% {
-                transform: rotate(360deg);
+                transform: rotate(360deg) translate3d(0, 0, 10px);
             }
         }
 
         @keyframes rotation-counterclockwise {
             0% {
-                transform: rotate(0deg);
+                transform: rotate(0deg) translate3d(0, 0, 10px); /* Applied translate3d here too */
             }
             100% {
-                transform: rotate(-360deg);
+                transform: rotate(-360deg) translate3d(0, 0, 10px);
             }
         }
-        /* --- END OF LOADER STYLES --- */
-        /* --- FIX FOR MOBILE JANK ENDS HERE --- */
 
 
         /* Responsive Text */
