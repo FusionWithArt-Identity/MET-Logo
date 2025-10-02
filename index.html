@@ -174,7 +174,7 @@
         }
         
         /* -----------------------------------
-            2. Logo & Loading Animation (Fixed for Uniformity)
+            2. Logo & Loading Animation (FIXED SCROLL RESTART ISSUE)
             ----------------------------------- */
         .logo-container {
             position: relative;
@@ -185,8 +185,10 @@
             justify-content: center;
             align-items: center;
             z-index: 1;
-            /* Performance optimization */
+            /* FIX: Prevent layout shifts that cause animation restart */
             transform: translateZ(0);
+            will-change: transform;
+            contain: layout style paint;
         }
         
         .logo {
@@ -210,7 +212,7 @@
             opacity: 0;
         }
         
-        /* --- DUAL LOADER STYLES --- */
+        /* --- DUAL LOADER STYLES - FIXED SCROLL RESTART ISSUE --- */
         .loader-outer {
             position: absolute; 
             top: -12px;
@@ -225,9 +227,12 @@
             border-bottom-color: var(--color-secondary);
             
             animation: rotation-clockwise 1.8s linear infinite;
-            /* Performance optimization */
+            /* FIX: Prevent animation restart on scroll */
             transform: translateZ(0);
             will-change: transform;
+            backface-visibility: hidden;
+            /* Isolate from document layout */
+            contain: strict;
         }
 
         .loader-inner {
@@ -244,26 +249,29 @@
             border-top-color: var(--color-primary);
             
             animation: rotation-counterclockwise 1.2s linear infinite;
-            /* Performance optimization */
+            /* FIX: Prevent animation restart on scroll */
             transform: translateZ(0);
             will-change: transform;
+            backface-visibility: hidden;
+            /* Isolate from document layout */
+            contain: strict;
         }
 
         @keyframes rotation-clockwise {
             0% {
-                transform: rotate(0deg);
+                transform: rotate(0deg) translateZ(0);
             }
             100% {
-                transform: rotate(360deg);
+                transform: rotate(360deg) translateZ(0);
             }
         }
 
         @keyframes rotation-counterclockwise {
             0% {
-                transform: rotate(0deg);
+                transform: rotate(0deg) translateZ(0);
             }
             100% {
-                transform: rotate(-360deg);
+                transform: rotate(-360deg) translateZ(0);
             }
         }
         /* --- END OF LOADER STYLES --- */
@@ -577,6 +585,19 @@
                 document.body.style.display = '';
             }, 250);
         });
+
+        // Force continuous animation - prevent browser from stopping animations
+        const loaderElements = document.querySelectorAll('.loader-outer, .loader-inner');
+        loaderElements.forEach(loader => {
+            loader.style.animationPlayState = 'running';
+        });
+
+        // Ensure animations continue during scroll
+        window.addEventListener('scroll', function() {
+            loaderElements.forEach(loader => {
+                loader.style.animationPlayState = 'running';
+            });
+        }, { passive: true });
         
     </script>
 </body>
