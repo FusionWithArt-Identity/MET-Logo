@@ -453,16 +453,20 @@
         let countdownElement = document.querySelector('.countdown');
         let loadingMessage = document.querySelector('.loading-message');
         let countdownValue = 3;
-        let redirectExecuted = false;
 
-        // Check if we're returning to the page after redirect
-        if (sessionStorage.getItem('redirectExecuted') === 'true') {
-            // Hide the loading message if user navigated back
+        // Check if user is coming back from the PDF document
+        const isReturningFromPDF = document.referrer.includes('About-Me.pdf') || 
+                                  sessionStorage.getItem('redirectTriggered') === 'true';
+
+        if (isReturningFromPDF) {
+            // Hide the loading message if user navigated back from PDF
             if (loadingMessage) {
                 loadingMessage.style.display = 'none';
             }
+            // Clear the session storage
+            sessionStorage.removeItem('redirectTriggered');
         } else {
-            // Update countdown display only if redirect hasn't executed yet
+            // Update countdown display only if this is a fresh visit
             const countdownInterval = setInterval(() => {
                 countdownValue--;
                 if (countdownElement) {
@@ -473,19 +477,13 @@
                 }
             }, 1000);
 
+            // Set flag before redirecting
+            sessionStorage.setItem('redirectTriggered', 'true');
+            
             setTimeout(() => {
-                redirectExecuted = true;
-                sessionStorage.setItem('redirectExecuted', 'true');
                 window.location.href = targetURL;
             }, redirectDelay);
         }
-
-        // Clear the session storage when page is unloaded (user leaves)
-        window.addEventListener('beforeunload', function() {
-            if (!redirectExecuted) {
-                sessionStorage.removeItem('redirectExecuted');
-            }
-        });
 
         /* -----------------------------------
             4. Disable Shortcut Keys (Meta Keys, Ctrl, Alt)
