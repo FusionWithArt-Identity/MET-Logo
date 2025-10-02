@@ -13,9 +13,9 @@
            ----------------------------------- */
         :root {
             --logo-size: 150px; 
-            --loader-border: 6px; 
-            --color-primary: #00796b; /* Darker Cyan */
-            --color-secondary: #004d40; /* Dark Teal */
+            --loader-border: 6px; /* Standardized border thickness */
+            --color-primary: #00796b; /* Darker Cyan (Used for the main arc) */
+            --color-secondary: #004d40; /* Dark Teal (Used for the complementary arc) */
         }
 
         /* -----------------------------------
@@ -48,7 +48,7 @@
         }
         
         /* -----------------------------------
-           2. Logo & Loading Animation (Fixed for Uniformity)
+           2. Logo & Loading Animation (Dual Element Fixed)
            ----------------------------------- */
         .logo-container {
             position: relative;
@@ -69,27 +69,46 @@
             z-index: 2; 
         }
         
-        /* --- LOADER STYLES (Simplified for Uniformity) --- */
+        /* --- LOADER STYLES (Your Code with Uniformity Fixes) --- */
         .loader {
-            position: absolute; 
-            top: 0;
-            left: 0;
+            /* This element forms the first half of the colored spin */
+            position: absolute;
             width: var(--logo-size);
             height: var(--logo-size);
             border-radius: 50%;
             box-sizing: border-box;
             z-index: 1; 
             
-            /* Background color border (the invisible part of the track) */
-            border: var(--loader-border) solid #e0f7fa; /* Match loader background to body gradient lighter end */
-
-            /* The visible, animating arc */
-            border-top-color: var(--color-primary); /* Cyan arc */
+            /* Main Arc: Cyan Top/Right */
+            border-top: var(--loader-border) solid var(--color-primary); 
+            border-right: var(--loader-border) solid transparent;
+            border-bottom: var(--loader-border) solid transparent; /* Ensure full transparency on unused sides */
+            border-left: var(--loader-border) solid transparent; 
             
-            animation: rotation 1s linear infinite; /* Rotation is linear and infinite */
+            /* The key fix: Apply rotation animation here */
+            animation: rotation 1s linear infinite;
         }
 
-        /* REMOVED ::after pseudo-element to ensure a single, uniform rotation path */
+        .loader::after {
+            /* This element forms the second half of the colored spin */
+            content: '';  
+            box-sizing: border-box;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: var(--logo-size);
+            height: var(--logo-size);
+            border-radius: 50%;
+            
+            /* Complementary Arc: Dark Teal Bottom/Left */
+            border-bottom: var(--loader-border) solid var(--color-secondary);
+            border-left: var(--loader-border) solid transparent;
+            border-top: var(--loader-border) solid transparent; /* Ensure full transparency on unused sides */
+            border-right: var(--loader-border) solid transparent;
+            
+            /* Apply the SAME rotation animation */
+            animation: rotation 1s linear infinite reverse; /* Optional: Reverse to create a more complex, interwoven effect */
+        }
 
         @keyframes rotation {
             0% {
