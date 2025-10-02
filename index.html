@@ -74,6 +74,8 @@
             animation: pulse 4s ease-in-out infinite;
             pointer-events: none;
             z-index: 0;
+            /* OPTIMIZATION: Hint the browser to prepare for opacity changes */
+            will-change: opacity;
         }
 
         @keyframes pulse {
@@ -90,11 +92,12 @@
             right: 20px;
             width: 80px;
             height: 80px;
-            /* UPDATED: Increased tilt to 25 degrees */
             transform: rotate(25deg);
             opacity: 0.9;
             z-index: 10;
             filter: drop-shadow(0 0 5px rgba(0, 121, 107, 0.5));
+            /* OPTIMIZATION: Hint the browser to prepare for transform changes */
+            will-change: transform;
         }
         
         /* -----------------------------------
@@ -151,11 +154,12 @@
             border-radius: 50%;
             box-sizing: border-box;
             z-index: 1; 
-            
             border: var(--loader-border) solid transparent;
             border-bottom-color: var(--color-secondary);
-            
             animation: rotation-clockwise 1.8s linear infinite;
+            /* OPTIMIZATION: Promote to its own layer for smoother animation */
+            will-change: transform;
+            backface-visibility: hidden;
         }
 
         .loader-inner {
@@ -167,11 +171,12 @@
             border-radius: 50%;
             box-sizing: border-box;
             z-index: 1; 
-            
             border: var(--loader-border) solid rgba(224, 247, 250, 0.1);
             border-top-color: var(--color-primary);
-            
             animation: rotation-counterclockwise 1.2s linear infinite;
+            /* OPTIMIZATION: Promote to its own layer for smoother animation */
+            will-change: transform;
+            backface-visibility: hidden;
         }
 
         @keyframes rotation-clockwise {
@@ -196,7 +201,6 @@
 
         /* Responsive Text */
         h1 {
-            /* UPDATED: Using stylish, futuristic 'Orbitron' font */
             font-family: 'Orbitron', sans-serif; 
             font-size: clamp(1.8rem, 5vw, 3rem); 
             margin-bottom: 10px;
@@ -221,15 +225,19 @@
             padding: 8px 16px;
             border: 2px solid var(--color-primary);
             border-radius: 4px;
-            transition: all 0.3s;
+            transition: background-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s;
             background: rgba(0, 121, 107, 0.2);
             backdrop-filter: blur(10px);
             z-index: 1;
+            /* OPTIMIZATION: Hint browser about upcoming changes for smoother transitions */
+            will-change: background-color, color, box-shadow, transform;
         }
         a:hover {
             background-color: var(--color-primary);
             color: #ffffff;
             box-shadow: 0 0 15px rgba(0, 121, 107, 0.5);
+            /* IMPROVEMENT: Add a subtle transform for a more responsive feel */
+            transform: scale(1.03);
         }
 
         /* Ensure content stays above background effects */
@@ -244,6 +252,39 @@
         @media print {
             * {
                 display: none !important;
+            }
+        }
+
+        /* -----------------------------------
+            RESPONSIVENESS IMPROVEMENTS
+            ----------------------------------- */
+        /* For tablets and smaller devices */
+        @media (max-width: 768px) {
+            :root {
+                --logo-size: 120px;
+                --loader-border: 5px;
+            }
+            .stamp {
+                width: 60px;
+                height: 60px;
+                top: 15px;
+                right: 15px;
+            }
+        }
+
+        /* For small mobile devices */
+        @media (max-width: 480px) {
+            :root {
+                --logo-size: 100px;
+            }
+            body {
+                padding: 15px;
+            }
+            h1 {
+                font-size: clamp(1.6rem, 6vw, 2.5rem);
+            }
+            p {
+                font-size: clamp(0.9rem, 4vw, 1.1rem);
             }
         }
     </style>
