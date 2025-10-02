@@ -71,7 +71,23 @@
         }
         
         /* --- DUAL LOADER STYLES --- */
-        .loader {
+        .loader-outer {
+            position: absolute; 
+            top: -12px;
+            left: -12px;
+            right: -12px;
+            bottom: -12px;
+            border-radius: 50%;
+            box-sizing: border-box;
+            z-index: 1; 
+            
+            border: var(--loader-border) solid transparent;
+            border-bottom-color: var(--color-secondary);
+            
+            animation: rotation-clockwise 1.8s linear infinite;
+        }
+
+        .loader-inner {
             position: absolute; 
             top: 0;
             left: 0;
@@ -81,38 +97,13 @@
             box-sizing: border-box;
             z-index: 1; 
             
-            /* Inner loader track */
             border: var(--loader-border) solid #e0f7fa;
-
-            /* Inner loader animating arc */
             border-top-color: var(--color-primary);
             
-            animation: rotation 1.2s linear infinite;
+            animation: rotation-counterclockwise 1.2s linear infinite;
         }
 
-        /* UPDATED: Added a second loader using a pseudo-element */
-        .loader::after {
-            content: '';
-            position: absolute;
-            /* Position it slightly outside the parent loader */
-            top: -12px;
-            left: -12px;
-            right: -12px;
-            bottom: -12px;
-            border-radius: 50%;
-            
-            /* Outer loader track (transparent) */
-            border: var(--loader-border) solid transparent;
-
-            /* Outer loader animating arc */
-            border-bottom-color: var(--color-secondary);
-
-            /* Use a separate animation to rotate in the opposite direction */
-            animation: rotation-reverse 1.8s linear infinite;
-        }
-
-
-        @keyframes rotation {
+        @keyframes rotation-clockwise {
             0% {
                 transform: rotate(0deg);
             }
@@ -121,8 +112,7 @@
             }
         }
 
-        /* MODIFIED: Uses negative degrees for counter-clockwise rotation */
-        @keyframes rotation-reverse {
+        @keyframes rotation-counterclockwise {
             0% {
                 transform: rotate(0deg);
             }
@@ -174,7 +164,8 @@
 <body oncontextmenu="return false;">
 
     <div class="logo-container">
-        <div class="loader"></div> 
+        <div class="loader-outer"></div> 
+        <div class="loader-inner"></div> 
         <img src="Logo.png" alt="M.E.T Logo" class="logo">
     </div>
 
