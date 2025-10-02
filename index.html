@@ -193,10 +193,14 @@
 
         /* Responsive Text */
         h1 {
+            /* --- UPDATED FOR PROFESSIONAL FONT STYLE --- */
+            font-family: 'Georgia', serif; 
+            /* ------------------------------------------- */
             font-size: clamp(1.8rem, 5vw, 3rem); 
             margin-bottom: 10px;
             color: #e0f7fa;
-            text-shadow: 0 0 10px rgba(0, 121, 107, 0.5);
+            /* Text shadow slightly darker for more contrast/professionalism */
+            text-shadow: 0 0 12px rgba(0, 121, 107, 0.7); 
             z-index: 1;
         }
         
@@ -245,13 +249,11 @@
 </head>
 <body oncontextmenu="return false;">
 
-    <!-- Preload images -->
     <div class="logo-preload">
         <img src="Logo.png" alt="Preload Logo">
         <img src="Stamp.png" alt="Preload Stamp">
     </div>
 
-    <!-- Stamp in corner -->
     <img src="Stamp.png" alt="Stamp" class="stamp">
 
     <div class="logo-container">
@@ -322,5 +324,3 @@
     </script>
 </body>
 </html>
-
-
