@@ -61,36 +61,56 @@
         }
         
         .logo {
-            width: 90%; /* UPDATED: Enforce square shape */
-            height: 90%; /* UPDATED: Enforce square shape */
-            object-fit: cover; /* UPDATED: Prevents image stretching and ensures uniformity */
+            width: 90%;
+            height: 90%;
+            object-fit: cover;
             border-radius: 50%;
             display: block;
             transition: transform 0.3s;
             z-index: 2; 
         }
         
-        /* --- LOADER STYLES (Simplified for Uniformity) --- */
+        /* --- DUAL LOADER STYLES --- */
         .loader {
             position: absolute; 
             top: 0;
             left: 0;
-            width: var(--logo-size);
-            height: var(--logo-size);
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
             box-sizing: border-box;
             z-index: 1; 
             
-            /* Background color border (the invisible part of the track) */
-            border: var(--loader-border) solid #e0f7fa; /* Match loader background to body gradient lighter end */
+            /* Inner loader track */
+            border: var(--loader-border) solid #e0f7fa;
 
-            /* The visible, animating arc */
-            border-top-color: var(--color-primary); /* Cyan arc */
+            /* Inner loader animating arc */
+            border-top-color: var(--color-primary);
             
-            animation: rotation 1s linear infinite; /* Rotation is linear and infinite */
+            animation: rotation 1.2s linear infinite;
         }
 
-        /* REMOVED ::after pseudo-element to ensure a single, uniform rotation path */
+        /* UPDATED: Added a second loader using a pseudo-element */
+        .loader::after {
+            content: '';
+            position: absolute;
+            /* Position it slightly outside the parent loader */
+            top: -12px;
+            left: -12px;
+            right: -12px;
+            bottom: -12px;
+            border-radius: 50%;
+            
+            /* Outer loader track (transparent) */
+            border: var(--loader-border) solid transparent;
+
+            /* Outer loader animating arc */
+            border-bottom-color: var(--color-secondary);
+
+            /* Use a separate animation to rotate in the opposite direction */
+            animation: rotation-reverse 1.8s linear infinite;
+        }
+
 
         @keyframes rotation {
             0% {
@@ -98,6 +118,16 @@
             }
             100% {
                 transform: rotate(360deg);
+            }
+        }
+
+        /* UPDATED: Added a new animation for the second loader */
+        @keyframes rotation-reverse {
+            0% {
+                transform: rotate(360deg);
+            }
+            100% {
+                transform: rotate(0deg);
             }
         }
         /* --- END OF LOADER STYLES --- */
