@@ -174,7 +174,7 @@
         }
         
         /* -----------------------------------
-            2. Logo & Loading Animation (ORIGINAL ANIMATION RESTORED)
+            2. Logo & Loading Animation (Fixed for Uniformity)
             ----------------------------------- */
         .logo-container {
             position: relative;
@@ -210,7 +210,7 @@
             opacity: 0;
         }
         
-        /* --- DUAL LOADER STYLES - ORIGINAL ANIMATION RESTORED --- */
+        /* --- DUAL LOADER STYLES --- */
         .loader-outer {
             position: absolute; 
             top: -12px;
@@ -225,7 +225,7 @@
             border-bottom-color: var(--color-secondary);
             
             animation: rotation-clockwise 1.8s linear infinite;
-            /* Performance optimization - FIXED SCROLL JERK */
+            /* Performance optimization */
             transform: translateZ(0);
             will-change: transform;
         }
@@ -244,7 +244,7 @@
             border-top-color: var(--color-primary);
             
             animation: rotation-counterclockwise 1.2s linear infinite;
-            /* Performance optimization - FIXED SCROLL JERK */
+            /* Performance optimization */
             transform: translateZ(0);
             will-change: transform;
         }
