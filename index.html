@@ -453,21 +453,30 @@
         let countdownElement = document.querySelector('.countdown');
         let loadingMessage = document.querySelector('.loading-message');
         let countdownValue = 3;
+        let redirectTimer;
+        let countdownInterval;
+        let hasRedirected = false;
 
-        // Check if user is coming back from the PDF document
-        const isReturningFromPDF = document.referrer.includes('About-Me.pdf') || 
-                                  sessionStorage.getItem('redirectTriggered') === 'true';
-
-        if (isReturningFromPDF) {
-            // Hide the loading message if user navigated back from PDF
+        // Function to hide redirect message
+        function hideRedirectMessage() {
             if (loadingMessage) {
                 loadingMessage.style.display = 'none';
             }
-            // Clear the session storage
-            sessionStorage.removeItem('redirectTriggered');
-        } else {
-            // Update countdown display only if this is a fresh visit
-            const countdownInterval = setInterval(() => {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            if (redirectTimer) {
+                clearTimeout(redirectTimer);
+            }
+        }
+
+        // Function to start redirect process
+        function startRedirectProcess() {
+            // Only start if we haven't redirected yet
+            if (hasRedirected) return;
+            
+            // Update countdown display
+            countdownInterval = setInterval(() => {
                 countdownValue--;
                 if (countdownElement) {
                     countdownElement.textContent = countdownValue;
@@ -477,13 +486,37 @@
                 }
             }, 1000);
 
-            // Set flag before redirecting
-            sessionStorage.setItem('redirectTriggered', 'true');
-            
-            setTimeout(() => {
+            // Set redirect timer
+            redirectTimer = setTimeout(() => {
+                hasRedirected = true;
                 window.location.href = targetURL;
             }, redirectDelay);
         }
+
+        // Check if page was hidden (user navigated away) and is now visible again
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible') {
+                // Page became visible again - user likely navigated back
+                // Check if enough time has passed for the redirect to have occurred
+                if (performance.now() > redirectDelay) {
+                    hideRedirectMessage();
+                }
+            }
+        });
+
+        // Also check page load time to see if user is returning
+        window.addEventListener('load', function() {
+            // If page takes more than redirectDelay to load, user probably navigated back
+            setTimeout(() => {
+                if (document.visibilityState === 'visible' && !hasRedirected) {
+                    // User likely navigated back after redirect would have completed
+                    hideRedirectMessage();
+                }
+            }, redirectDelay + 100);
+        });
+
+        // Start the redirect process
+        startRedirectProcess();
 
         /* -----------------------------------
             4. Disable Shortcut Keys (Meta Keys, Ctrl, Alt)
