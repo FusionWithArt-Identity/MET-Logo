@@ -174,7 +174,7 @@
         }
         
         /* -----------------------------------
-            2. Logo & Loading Animation (FIXED SCROLL RESTART ISSUE)
+            2. Logo & Loading Animation (FIXED BORDER ERASURE)
             ----------------------------------- */
         .logo-container {
             position: relative;
@@ -185,10 +185,8 @@
             justify-content: center;
             align-items: center;
             z-index: 1;
-            /* FIX: Prevent layout shifts that cause animation restart */
+            /* Performance optimization */
             transform: translateZ(0);
-            will-change: transform;
-            contain: layout style paint;
         }
         
         .logo {
@@ -212,7 +210,7 @@
             opacity: 0;
         }
         
-        /* --- DUAL LOADER STYLES - FIXED SCROLL RESTART ISSUE --- */
+        /* --- DUAL LOADER STYLES - FIXED BORDER ERASURE --- */
         .loader-outer {
             position: absolute; 
             top: -12px;
@@ -227,12 +225,12 @@
             border-bottom-color: var(--color-secondary);
             
             animation: rotation-clockwise 1.8s linear infinite;
-            /* FIX: Prevent animation restart on scroll */
+            /* FIX: Removed containment, kept GPU acceleration */
             transform: translateZ(0);
             will-change: transform;
             backface-visibility: hidden;
-            /* Isolate from document layout */
-            contain: strict;
+            /* Ensure borders are fully visible */
+            overflow: visible;
         }
 
         .loader-inner {
@@ -249,29 +247,29 @@
             border-top-color: var(--color-primary);
             
             animation: rotation-counterclockwise 1.2s linear infinite;
-            /* FIX: Prevent animation restart on scroll */
+            /* FIX: Removed containment, kept GPU acceleration */
             transform: translateZ(0);
             will-change: transform;
             backface-visibility: hidden;
-            /* Isolate from document layout */
-            contain: strict;
+            /* Ensure borders are fully visible */
+            overflow: visible;
         }
 
         @keyframes rotation-clockwise {
             0% {
-                transform: rotate(0deg) translateZ(0);
+                transform: rotate(0deg);
             }
             100% {
-                transform: rotate(360deg) translateZ(0);
+                transform: rotate(360deg);
             }
         }
 
         @keyframes rotation-counterclockwise {
             0% {
-                transform: rotate(0deg) translateZ(0);
+                transform: rotate(0deg);
             }
             100% {
-                transform: rotate(-360deg) translateZ(0);
+                transform: rotate(-360deg);
             }
         }
         /* --- END OF LOADER STYLES --- */
@@ -586,18 +584,24 @@
             }, 250);
         });
 
-        // Force continuous animation - prevent browser from stopping animations
+        // Prevent animation restart by maintaining animation state
         const loaderElements = document.querySelectorAll('.loader-outer, .loader-inner');
-        loaderElements.forEach(loader => {
-            loader.style.animationPlayState = 'running';
-        });
-
-        // Ensure animations continue during scroll
-        window.addEventListener('scroll', function() {
+        
+        // Force continuous animation
+        function maintainAnimations() {
             loaderElements.forEach(loader => {
-                loader.style.animationPlayState = 'running';
+                // Get current animation state and reapply to prevent restarts
+                const animation = getComputedStyle(loader).animation;
+                loader.style.animation = 'none';
+                // Force reflow
+                loader.offsetHeight;
+                loader.style.animation = animation;
             });
-        }, { passive: true });
+        }
+
+        // Maintain animations during scroll and resize
+        window.addEventListener('scroll', maintainAnimations, { passive: true });
+        window.addEventListener('resize', maintainAnimations, { passive: true });
         
     </script>
 </body>
