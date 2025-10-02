@@ -175,6 +175,7 @@
         
         /* -----------------------------------
             2. Logo & Loading Animation (FIXED BORDER ERASURE)
+            --- FIX FOR MOBILE JANK STARTS HERE ---
             ----------------------------------- */
         .logo-container {
             position: relative;
@@ -184,9 +185,12 @@
             display: flex; 
             justify-content: center;
             align-items: center;
-            z-index: 1;
-            /* Performance optimization */
+            z-index: 10; /* Increased z-index to ensure it sits on a robust layer */
+            /* Performance optimization - Keep the existing transform */
             transform: translateZ(0);
+            /* --- THE CRITICAL FIX: Isolate for better compositing during overscroll --- */
+            will-change: transform, z-index; 
+            transform-style: preserve-3d; /* New: Ensures 3D context for smooth rotation */
         }
         
         .logo {
@@ -273,6 +277,7 @@
             }
         }
         /* --- END OF LOADER STYLES --- */
+        /* --- FIX FOR MOBILE JANK ENDS HERE --- */
 
 
         /* Responsive Text */
@@ -599,9 +604,9 @@
             });
         }
 
-        // Maintain animations during scroll and resize
-        window.addEventListener('scroll', maintainAnimations, { passive: true });
-        window.addEventListener('resize', maintainAnimations, { passive: true });
+        // Fix: Removed 'passive: true' for scroll/resize to potentially prevent interaction conflicts
+        window.addEventListener('scroll', maintainAnimations); 
+        window.addEventListener('resize', maintainAnimations);
         
     </script>
 </body>
