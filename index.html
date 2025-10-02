@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Welcome to M.E.T.</title>
 
     <meta name="description" content="Welcome page for M.E.T., redirecting to the About Me document.">
@@ -20,14 +20,27 @@
             --color-secondary: #004d40; /* Dark Teal */
         }
 
+        /* Mobile-first responsive adjustments */
+        @media (max-width: 768px) and (orientation: portrait) {
+            :root {
+                --logo-size: 120px;
+                --loader-border: 5px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            :root {
+                --logo-size: 100px;
+                --loader-border: 4px;
+            }
+        }
+
         /* -----------------------------------
             1. Digital Technological Background
             ----------------------------------- */
         body {
             background: 
-                linear-gradient(135deg, #0a1929 0%, #1a3a5f 50%, #0a1929 100%),
-                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 121, 107, 0.1) 10px, rgba(0, 121, 107, 0.1) 20px),
-                repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(0, 77, 64, 0.1) 10px, rgba(0, 77, 64, 0.1) 20px);
+                linear-gradient(135deg, #0a1929 0%, #1a3a5f 50%, #0a1929 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
@@ -41,9 +54,15 @@
             box-sizing: border-box;
             position: relative;
             overflow: hidden;
+            /* Performance optimization */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+            perspective: 1000;
         }
 
-        /* Digital grid overlay */
+        /* Digital grid overlay - simplified for performance */
         body::before {
             content: '';
             position: absolute;
@@ -52,14 +71,14 @@
             right: 0;
             bottom: 0;
             background: 
-                linear-gradient(90deg, transparent 99%, rgba(0, 121, 107, 0.1) 99%),
-                linear-gradient(0deg, transparent 99%, rgba(0, 121, 107, 0.1) 99%);
-            background-size: 30px 30px;
+                linear-gradient(90deg, transparent 99%, rgba(0, 121, 107, 0.05) 99%),
+                linear-gradient(0deg, transparent 99%, rgba(0, 121, 107, 0.05) 99%);
+            background-size: 40px 40px;
             pointer-events: none;
             z-index: 0;
         }
 
-        /* Animated digital particles */
+        /* Animated digital particles - simplified for performance */
         body::after {
             content: '';
             position: absolute;
@@ -68,19 +87,18 @@
             right: 0;
             bottom: 0;
             background: 
-                radial-gradient(circle at 20% 80%, rgba(0, 121, 107, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(0, 77, 64, 0.15) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(0, 121, 107, 0.1) 0%, transparent 50%);
-            animation: pulse 4s ease-in-out infinite;
+                radial-gradient(circle at 20% 80%, rgba(0, 121, 107, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(0, 77, 64, 0.1) 0%, transparent 50%);
+            animation: pulse 6s ease-in-out infinite;
             pointer-events: none;
             z-index: 0;
-            /* OPTIMIZATION: Hint the browser to prepare for opacity changes */
+            /* Performance optimization */
             will-change: opacity;
         }
 
         @keyframes pulse {
-            0%, 100% { opacity: 0.5; }
-            50% { opacity: 0.8; }
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
         }
         
         /* -----------------------------------
@@ -92,12 +110,28 @@
             right: 20px;
             width: 80px;
             height: 80px;
+            /* UPDATED: Increased tilt to 25 degrees */
             transform: rotate(25deg);
             opacity: 0.9;
             z-index: 10;
             filter: drop-shadow(0 0 5px rgba(0, 121, 107, 0.5));
-            /* OPTIMIZATION: Hint the browser to prepare for transform changes */
-            will-change: transform;
+            /* Performance optimization */
+            transform: translateZ(0);
+        }
+        
+        /* Responsive stamp sizing */
+        @media (max-width: 768px) {
+            .stamp {
+                width: 60px;
+                height: 60px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .stamp {
+                width: 50px;
+                height: 50px;
+            }
         }
         
         /* -----------------------------------
@@ -109,6 +143,8 @@
             -moz-user-select: none;
             -ms-user-select: none;
             cursor: default;
+            /* Performance optimization */
+            -webkit-tap-highlight-color: transparent;
         }
         
         /* -----------------------------------
@@ -123,6 +159,8 @@
             justify-content: center;
             align-items: center;
             z-index: 1;
+            /* Performance optimization */
+            transform: translateZ(0);
         }
         
         .logo {
@@ -133,6 +171,8 @@
             display: block;
             transition: transform 0.3s;
             z-index: 2; 
+            /* Performance optimization */
+            transform: translateZ(0);
         }
         
         /* Preload the logo image */
@@ -154,12 +194,14 @@
             border-radius: 50%;
             box-sizing: border-box;
             z-index: 1; 
+            
             border: var(--loader-border) solid transparent;
             border-bottom-color: var(--color-secondary);
+            
             animation: rotation-clockwise 1.8s linear infinite;
-            /* OPTIMIZATION: Promote to its own layer for smoother animation */
+            /* Performance optimization */
+            transform: translateZ(0);
             will-change: transform;
-            backface-visibility: hidden;
         }
 
         .loader-inner {
@@ -171,12 +213,14 @@
             border-radius: 50%;
             box-sizing: border-box;
             z-index: 1; 
+            
             border: var(--loader-border) solid rgba(224, 247, 250, 0.1);
             border-top-color: var(--color-primary);
+            
             animation: rotation-counterclockwise 1.2s linear infinite;
-            /* OPTIMIZATION: Promote to its own layer for smoother animation */
+            /* Performance optimization */
+            transform: translateZ(0);
             will-change: transform;
-            backface-visibility: hidden;
         }
 
         @keyframes rotation-clockwise {
@@ -201,12 +245,15 @@
 
         /* Responsive Text */
         h1 {
+            /* UPDATED: Using stylish, futuristic 'Orbitron' font */
             font-family: 'Orbitron', sans-serif; 
             font-size: clamp(1.8rem, 5vw, 3rem); 
             margin-bottom: 10px;
             color: #e0f7fa;
             text-shadow: 0 0 12px rgba(0, 121, 107, 0.7);
             z-index: 1;
+            /* Performance optimization */
+            transform: translateZ(0);
         }
         
         p {
@@ -214,6 +261,8 @@
             margin-top: 5px;
             color: #b2ebf2;
             z-index: 1;
+            /* Performance optimization */
+            transform: translateZ(0);
         }
         
         a {
@@ -225,19 +274,17 @@
             padding: 8px 16px;
             border: 2px solid var(--color-primary);
             border-radius: 4px;
-            transition: background-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s;
+            transition: all 0.3s;
             background: rgba(0, 121, 107, 0.2);
             backdrop-filter: blur(10px);
             z-index: 1;
-            /* OPTIMIZATION: Hint browser about upcoming changes for smoother transitions */
-            will-change: background-color, color, box-shadow, transform;
+            /* Performance optimization */
+            transform: translateZ(0);
         }
         a:hover {
             background-color: var(--color-primary);
             color: #ffffff;
             box-shadow: 0 0 15px rgba(0, 121, 107, 0.5);
-            /* IMPROVEMENT: Add a subtle transform for a more responsive feel */
-            transform: scale(1.03);
         }
 
         /* Ensure content stays above background effects */
@@ -254,37 +301,23 @@
                 display: none !important;
             }
         }
-
-        /* -----------------------------------
-            RESPONSIVENESS IMPROVEMENTS
-            ----------------------------------- */
-        /* For tablets and smaller devices */
-        @media (max-width: 768px) {
-            :root {
-                --logo-size: 120px;
-                --loader-border: 5px;
-            }
-            .stamp {
-                width: 60px;
-                height: 60px;
-                top: 15px;
-                right: 15px;
-            }
-        }
-
-        /* For small mobile devices */
-        @media (max-width: 480px) {
-            :root {
-                --logo-size: 100px;
-            }
+        
+        /* Additional responsive adjustments for landscape mode */
+        @media (max-height: 500px) and (orientation: landscape) {
             body {
-                padding: 15px;
+                padding: 10px;
             }
+            
+            .logo-container {
+                margin-bottom: 15px;
+            }
+            
             h1 {
-                font-size: clamp(1.6rem, 6vw, 2.5rem);
+                margin-bottom: 5px;
             }
+            
             p {
-                font-size: clamp(0.9rem, 4vw, 1.1rem);
+                margin-top: 3px;
             }
         }
     </style>
@@ -361,6 +394,14 @@
         // Disable right-click for context menu
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
+        });
+        
+        // Handle orientation changes for better performance
+        window.addEventListener('orientationchange', function() {
+            // Force a reflow to fix rendering issues
+            document.body.style.display = 'none';
+            document.body.offsetHeight; // Trigger reflow
+            document.body.style.display = '';
         });
         
     </script>
