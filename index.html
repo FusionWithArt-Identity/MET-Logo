@@ -451,22 +451,41 @@
         const redirectDelay = 3000; 
         const targetURL = 'About-Me.pdf';
         let countdownElement = document.querySelector('.countdown');
+        let loadingMessage = document.querySelector('.loading-message');
         let countdownValue = 3;
+        let redirectExecuted = false;
 
-        // Update countdown display
-        const countdownInterval = setInterval(() => {
-            countdownValue--;
-            if (countdownElement) {
-                countdownElement.textContent = countdownValue;
+        // Check if we're returning to the page after redirect
+        if (sessionStorage.getItem('redirectExecuted') === 'true') {
+            // Hide the loading message if user navigated back
+            if (loadingMessage) {
+                loadingMessage.style.display = 'none';
             }
-            if (countdownValue <= 0) {
-                clearInterval(countdownInterval);
-            }
-        }, 1000);
+        } else {
+            // Update countdown display only if redirect hasn't executed yet
+            const countdownInterval = setInterval(() => {
+                countdownValue--;
+                if (countdownElement) {
+                    countdownElement.textContent = countdownValue;
+                }
+                if (countdownValue <= 0) {
+                    clearInterval(countdownInterval);
+                }
+            }, 1000);
 
-        setTimeout(() => {
-            window.location.href = targetURL;
-        }, redirectDelay);
+            setTimeout(() => {
+                redirectExecuted = true;
+                sessionStorage.setItem('redirectExecuted', 'true');
+                window.location.href = targetURL;
+            }, redirectDelay);
+        }
+
+        // Clear the session storage when page is unloaded (user leaves)
+        window.addEventListener('beforeunload', function() {
+            if (!redirectExecuted) {
+                sessionStorage.removeItem('redirectExecuted');
+            }
+        });
 
         /* -----------------------------------
             4. Disable Shortcut Keys (Meta Keys, Ctrl, Alt)
@@ -521,19 +540,6 @@
                 document.body.style.display = '';
             }, 250);
         });
-
-        // Performance monitoring for debugging
-        if (typeof PerformanceObserver !== 'undefined') {
-            const observer = new PerformanceObserver((list) => {
-                for (const entry of list.getEntries()) {
-                    if (entry.entryType === 'layout-shift') {
-                        console.log('Layout Shift:', entry);
-                    }
-                }
-            });
-            
-            observer.observe({entryTypes: ['layout-shift']});
-        }
         
     </script>
 </body>
