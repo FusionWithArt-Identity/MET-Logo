@@ -3,13 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to M.E.T.</title>
+    <title>Welcome to M.E.T | Loading Document</title>
 
-    <meta name="description" content="Welcome page for M.E.T., redirecting to the About Me document.">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+    <meta name="description" content="Welcome page for M.E.T, redirecting to the About Me document.">
 
     <style>
         /* -----------------------------------
@@ -20,7 +16,6 @@
             --loader-border: 6px; 
             --color-primary: #00796b; /* Darker Cyan */
             --color-secondary: #004d40; /* Dark Teal */
-            --neon-color: #00e5ff; /* Bright Cyan for Neon Effect */
         }
 
         /* -----------------------------------
@@ -195,42 +190,16 @@
         }
         /* --- END OF LOADER STYLES --- */
 
-        /* ========== MODIFICATION START ========== */
-        /* Stylish H1 with Neon Animation */
+
+        /* Responsive Text */
         h1 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(2rem, 6vw, 3.5rem);
-            margin-bottom: 15px;
-            color: #fff;
+            font-size: clamp(1.8rem, 5vw, 3rem); 
+            margin-bottom: 10px;
+            color: #e0f7fa;
+            text-shadow: 0 0 10px rgba(0, 121, 107, 0.5);
             z-index: 1;
-            animation: neon-glow 1.5s ease-in-out infinite alternate;
         }
         
-        /* Keyframes for the neon glow effect */
-        @keyframes neon-glow {
-            from {
-                text-shadow:
-                    0 0 10px #fff,
-                    0 0 20px #fff,
-                    0 0 30px var(--neon-color),
-                    0 0 40px var(--neon-color),
-                    0 0 50px var(--neon-color),
-                    0 0 60px var(--neon-color),
-                    0 0 70px var(--neon-color);
-            }
-            to {
-                text-shadow:
-                    0 0 20px #fff,
-                    0 0 30px #4dd0e1, /* Slightly different cyan for pulsing */
-                    0 0 40px #4dd0e1,
-                    0 0 50px #4dd0e1,
-                    0 0 60px #4dd0e1,
-                    0 0 70px #4dd0e1,
-                    0 0 80px #4dd0e1;
-            }
-        }
-        /* ========== MODIFICATION END ========== */
-
         p {
             font-size: clamp(1rem, 2vw, 1.2rem); 
             margin-top: 5px;
@@ -276,22 +245,24 @@
 </head>
 <body oncontextmenu="return false;">
 
+    <!-- Preload images -->
     <div class="logo-preload">
         <img src="Logo.png" alt="Preload Logo">
         <img src="Stamp.png" alt="Preload Stamp">
     </div>
 
+    <!-- Stamp in corner -->
     <img src="Stamp.png" alt="Stamp" class="stamp">
 
     <div class="logo-container">
         <div class="loader-outer"></div> 
         <div class="loader-inner"></div> 
-        <img src="Logo.png" alt="M.E.T. Logo" class="logo">
+        <img src="Logo.png" alt="M.E.T Logo" class="logo">
     </div>
 
-    <h1>Welcome to M.E.T.</h1>
+    <h1>Welcome to M.E.T</h1>
     
-    <p>If the page content does not load automatically, please click the option/ link below - </p>
+    <p>If the page content does not load, please click the link below:</p>
     
     <p>
         <a href="About-Me.pdf">
