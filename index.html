@@ -11,7 +11,7 @@
             CSS Variables for Responsive Sizing
             ----------------------------------- */
         :root {
-            --logo-size: 150px; 
+            --logo-size: 180px; /* INCREASED from 150px */
             --loader-border: 6px; 
             --color-primary: #00796b; /* Darker Cyan */
             --color-secondary: #004d40; /* Dark Teal */
@@ -21,21 +21,21 @@
         /* Mobile-first responsive adjustments */
         @media (max-width: 768px) and (orientation: portrait) {
             :root {
-                --logo-size: 120px;
+                --logo-size: 150px; /* INCREASED from 120px */
                 --loader-border: 5px;
             }
         }
         
         @media (max-width: 480px) {
             :root {
-                --logo-size: 100px;
+                --logo-size: 130px; /* INCREASED from 100px */
                 --loader-border: 4px;
             }
         }
 
         @media (max-height: 500px) and (orientation: landscape) {
             :root {
-                --logo-size: 90px;
+                --logo-size: 110px; /* INCREASED from 90px */
             }
         }
 
@@ -120,14 +120,14 @@
         }
         
         /* -----------------------------------
-            Stamp Image in Corner
+            Stamp Image in Corner - INCREASED SIZE
             ----------------------------------- */
         .stamp {
             position: fixed;
             top: 20px;
             right: 20px;
-            width: 80px;
-            height: 80px;
+            width: 100px; /* INCREASED from 80px */
+            height: 100px; /* INCREASED from 80px */
             /* UPDATED: Increased tilt to 25 degrees */
             transform: rotate(25deg);
             opacity: 0.9;
@@ -140,20 +140,20 @@
         /* Responsive stamp sizing */
         @media (max-width: 768px) {
             .stamp {
-                width: 60px;
-                height: 60px;
+                width: 80px; /* INCREASED from 60px */
+                height: 80px; /* INCREASED from 60px */
             }
         }
         
         @media (max-width: 480px) {
             .stamp {
-                width: 50px;
-                height: 50px;
+                width: 70px; /* INCREASED from 50px */
+                height: 70px; /* INCREASED from 50px */
             }
         }
         
         /* -----------------------------------
-            3 & 4. Security & Protection
+            3 & 4. Security & Protection - TEXT SELECTION DISABLED
             ----------------------------------- */
         * {
             user-select: none;
@@ -165,12 +165,12 @@
             -webkit-tap-highlight-color: transparent;
         }
         
-        /* Allow text selection for accessibility */
-        p, h1, a {
-            user-select: text;
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            -ms-user-select: text;
+        /* Allow text selection only for the link for accessibility */
+        a {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
         
         /* -----------------------------------
@@ -536,6 +536,12 @@
         // Disable right-click for context menu
         document.addEventListener('contextmenu', function(e) {
             e.preventDefault();
+        });
+        
+        // Additional text selection prevention for older browsers
+        document.addEventListener('selectstart', function(e) {
+            e.preventDefault();
+            return false;
         });
         
         // Handle orientation changes for better performance
