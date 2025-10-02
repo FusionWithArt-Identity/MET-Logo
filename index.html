@@ -12,14 +12,17 @@
            CSS Variables for Responsive Sizing
            ----------------------------------- */
         :root {
-            --logo-size: 150px; 
-            --loader-border: 6px; 
-            --color-primary: #00796b; /* Darker Cyan */
-            --color-secondary: #004d40; /* Dark Teal */
+            /* Set the loader/logo size relative to the viewport for responsiveness */
+            --logo-size: clamp(100px, 15vw, 150px); 
+            --loader-border: 4px; /* Matches your required 4px */
+            --color-primary: #00796b; /* Darker Cyan (used for text/link color) */
+            --color-secondary: #004d40; /* Dark Teal (used for text/link color) */
+            --loader-arc1: #FFF; /* Arc 1 color: White, as requested */
+            --loader-arc2: #FF3D00; /* Arc 2 color: Orange/Red, as requested */
         }
 
         /* -----------------------------------
-           1. Suble Cyan Gradient & Core Layout
+           1, 5, 6. Layout, Gradient, Responsiveness
            ----------------------------------- */
         body {
             background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
@@ -48,7 +51,7 @@
         }
         
         /* -----------------------------------
-           2. Logo & Loading Animation (Fixed for Uniformity)
+           2. Logo & Loading Animation (Your Exact Code Adapted)
            ----------------------------------- */
         .logo-container {
             position: relative;
@@ -65,31 +68,51 @@
             height: auto;
             border-radius: 50%;
             display: block;
-            transition: transform 0.3s;
             z-index: 2; 
         }
         
-        /* --- LOADER STYLES (Simplified for Uniformity) --- */
+        /* --- LOADER STYLES (Your EXACT provided CSS adapted for size/position) --- */
         .loader {
-            position: absolute; 
-            top: 0;
-            left: 0;
+            position: absolute; /* Anchor to the container */
             width: var(--logo-size);
             height: var(--logo-size);
             border-radius: 50%;
+            display: inline-block;
             box-sizing: border-box;
             z-index: 1; 
-            
-            /* Background color border (the invisible part of the track) */
-            border: var(--loader-border) solid #e0f7fa; /* Match loader background to body gradient lighter end */
 
-            /* The visible, animating arc */
-            border-top-color: var(--color-primary); /* Cyan arc */
+            /* Arc 1: White top, transparent right */
+            border-top: var(--loader-border) solid var(--loader-arc1); 
+            border-right: var(--loader-border) solid transparent;
             
-            animation: rotation 1s linear infinite; /* Rotation is linear and infinite */
+            /* Add missing transparent borders for full circle structure */
+            border-bottom: var(--loader-border) solid transparent;
+            border-left: var(--loader-border) solid transparent;
+
+            animation: rotation 1s linear infinite;
         }
 
-        /* REMOVED ::after pseudo-element to ensure a single, uniform rotation path */
+        .loader::after {
+            content: '';  
+            box-sizing: border-box;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: var(--logo-size);
+            height: var(--logo-size);
+            border-radius: 50%;
+            
+            /* Arc 2: Orange/Red bottom, transparent left */
+            border-bottom: var(--loader-border) solid var(--loader-arc2);
+            border-left: var(--loader-border) solid transparent;
+
+            /* Add missing transparent borders for full circle structure */
+            border-top: var(--loader-border) solid transparent;
+            border-right: var(--loader-border) solid transparent;
+            
+            /* The key fix for uniform motion: This second element must also rotate! */
+            animation: rotation 1s linear infinite; 
+        }
 
         @keyframes rotation {
             0% {
@@ -102,7 +125,7 @@
         /* --- END OF LOADER STYLES --- */
 
 
-        /* Responsive Text */
+        /* Responsive Text and Links (Unchanged) */
         h1 {
             font-size: clamp(1.8rem, 5vw, 3rem); 
             margin-bottom: 10px;
