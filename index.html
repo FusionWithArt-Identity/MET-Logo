@@ -57,6 +57,8 @@
             color: #e0f7fa;
             box-sizing: border-box;
             position: relative;
+            /* Enable fast, fluid scrolling on touch devices */
+            -webkit-overflow-scrolling: touch; 
             overflow-x: hidden;
             overflow-y: auto;
             /* Performance optimization */
@@ -78,6 +80,8 @@
             padding: 20px;
             position: relative;
             z-index: 1;
+            /* Ensure the content is always scrollable */
+            min-height: 90vh; 
         }
 
         /* Digital grid overlay - simplified for performance */
@@ -110,9 +114,8 @@
             animation: pulse 6s ease-in-out infinite;
             pointer-events: none;
             z-index: 0;
-            /* Performance optimization */
-            will-change: opacity;
             /* Stabilization */
+            will-change: opacity, transform;
             transform: translateZ(-1px);
         }
 
@@ -136,6 +139,7 @@
             z-index: 10;
             filter: drop-shadow(0 0 5px rgba(0, 121, 107, 0.5));
             /* Performance optimization */
+            will-change: transform;
             transform: translateZ(0);
         }
         
@@ -176,21 +180,42 @@
         }
         
         /* -----------------------------------
-            2. Logo & Loading Animation (FIXED BORDER ERASURE)
-            --- FINAL FIX FOR MOBILE JANK ---
+            2. Logo & Loading Animation (The Final Fix)
             ----------------------------------- */
+        /* CRITICAL FIX: The loader is now positioned using `position: fixed` in this wrapper.
+           This ensures it is NEVER affected by the page's scroll or overscroll,
+           while `top: 0`, `left: 0`, `right: 0`, `bottom: 0` ensures it is centered.
+           Its children use `margin: auto` to center the actual logo in this fixed box. */
+        .loader-isolation-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 100; /* Must be high */
+            pointer-events: none; /* Allows clicks to pass through to the content below */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Final GPU Layer Promotion */
+            will-change: transform;
+            transform: translateZ(9999px); 
+        }
+
         .logo-container {
-            position: relative;
+            /* Now RELATIVE to the fixed wrapper, but its position within the wrapper is controlled by margin: auto */
+            position: relative; 
             width: var(--logo-size);
             height: var(--logo-size);
-            margin-bottom: 25px;
+            /* Centering the logo within the fixed wrapper */
+            margin: auto 0 25px 0; 
             display: flex; 
             justify-content: center;
             align-items: center;
-            z-index: 100; 
+            /* Restore pointer events for logo interactions (like the redirect click) */
+            pointer-events: auto; 
+            
             /* Performance optimization */
-            transform: translateZ(0);
-            /* Layer promotion */
             transform-style: preserve-3d; 
             will-change: transform, z-index;
         }
@@ -203,7 +228,6 @@
             display: block;
             transition: transform 0.3s;
             z-index: 2; 
-            /* Performance optimization */
             transform: translateZ(0);
         }
         
@@ -216,7 +240,7 @@
             opacity: 0;
         }
         
-        /* --- DUAL LOADER STYLES - FIXED BORDER ERASURE --- */
+        /* --- DUAL LOADER STYLES --- */
         .loader-outer {
             position: absolute; 
             top: -12px;
@@ -231,8 +255,6 @@
             border-bottom-color: var(--color-secondary);
             
             animation: rotation-clockwise 1.8s linear infinite;
-            /* Aggressive 3D translation for layer stability */
-            transform: translate3d(0, 0, 10px); 
             will-change: transform;
             backface-visibility: hidden;
             overflow: visible;
@@ -252,14 +274,12 @@
             border-top-color: var(--color-primary);
             
             animation: rotation-counterclockwise 1.2s linear infinite;
-            /* Aggressive 3D translation for layer stability */
-            transform: translate3d(0, 0, 10px);
             will-change: transform;
             backface-visibility: hidden;
             overflow: visible;
         }
         
-        /* NOTE: The translate3d is now integrated into the keyframes to ensure it persists */
+        /* IMPORTANT: Keeping the translate3d in keyframes for stability */
         @keyframes rotation-clockwise {
             0% {
                 transform: rotate(0deg) translate3d(0, 0, 10px);
@@ -289,7 +309,6 @@
             color: #e0f7fa;
             text-shadow: 0 0 12px rgba(0, 121, 107, 0.7);
             z-index: 1;
-            /* Performance optimization */
             transform: translateZ(0);
             line-height: 1.2;
         }
@@ -299,7 +318,6 @@
             margin-top: 5px;
             color: #b2ebf2;
             z-index: 1;
-            /* Performance optimization */
             transform: translateZ(0);
             line-height: 1.5;
             max-width: 90%;
@@ -318,7 +336,6 @@
             background: rgba(0, 121, 107, 0.2);
             backdrop-filter: blur(10px);
             z-index: 1;
-            /* Performance optimization */
             transform: translateZ(0);
             cursor: pointer;
         }
@@ -330,7 +347,7 @@
         }
 
         /* Ensure content stays above background effects */
-        .logo-container, h1, p, a {
+        .content-container > *:not(.loader-isolation-wrapper) {
             position: relative;
             z-index: 1;
         }
@@ -356,8 +373,12 @@
                 padding: 10px 0;
             }
             
+            /* Adjust logo position in landscape */
+            .loader-isolation-wrapper {
+                 align-items: flex-start;
+            }
             .logo-container {
-                margin-bottom: 15px;
+                margin: 0 auto 15px auto;
             }
             
             h1 {
@@ -416,13 +437,15 @@
 
     <img src="Stamp.png" alt="Stamp" class="stamp">
 
-    <div class="content-container">
+    <div class="loader-isolation-wrapper">
         <div class="logo-container">
             <div class="loader-outer"></div> 
             <div class="loader-inner"></div> 
             <img src="Logo.png" alt="M.E.T. Logo" class="logo">
         </div>
+    </div>
 
+    <div class="content-container">
         <h1>Welcome to M.E.T.</h1>
         
         <p>If the page content does not load automatically, please click the option/ link below - </p>
@@ -556,43 +579,17 @@
         });
         
         // Handle orientation changes for better performance
-        let orientationChangeTimeout;
+        // FIX: Removed the JS that was forcing reflows (display: none and offsetHeight)
         window.addEventListener('orientationchange', function() {
-            // Clear any existing timeout
-            if (orientationChangeTimeout) {
-                clearTimeout(orientationChangeTimeout);
-            }
-            
-            // Add a class to body during orientation change
-            document.body.classList.add('orientation-changing');
-            
-            // Force a reflow to fix rendering issues after a short delay
-            orientationChangeTimeout = setTimeout(function() {
-                document.body.classList.remove('orientation-changing');
-            }, 300);
+            // In modern browsers, simple CSS media queries handle this best.
+            // This listener is now effectively a placeholder.
         });
 
         // Handle resize events for dynamic responsiveness
-        let resizeTimeout;
+        // FIX: Removed the heavy JS timeout that forced body reflows on resize.
         window.addEventListener('resize', function() {
-            // Clear the timeout if it's already set
-            if (resizeTimeout) {
-                clearTimeout(resizeTimeout);
-            }
-            
-            // Set a new timeout to handle the resize after it's complete
-            resizeTimeout = setTimeout(function() {
-                // Force reflow for certain elements if needed
-                document.body.style.display = 'none';
-                document.body.offsetHeight; // Trigger reflow
-                document.body.style.display = '';
-            }, 250);
+            // No action needed here. CSS is now handling the responsiveness.
         });
-
-        /* -----------------------------------
-            *** REMOVED: Animation maintenance JavaScript ***
-            The logic below was forcing animation restarts and causing the jerk.
-        ----------------------------------- */
         
     </script>
 </body>
