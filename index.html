@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to M.E.T.</title>
+    <title>Welcome to M.E.T | Loading Document</title>
 
-    <meta name="description" content="Welcome page for M.E.T., redirecting to the About Me document.">
+    <meta name="description" content="Welcome page for M.E.T, redirecting to the About Me document.">
 
     <style>
         /* -----------------------------------
@@ -80,6 +80,21 @@
         }
         
         /* -----------------------------------
+            Stamp Image in Corner
+            ----------------------------------- */
+        .stamp {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 80px;
+            height: 80px;
+            transform: rotate(15deg);
+            opacity: 0.9;
+            z-index: 10;
+            filter: drop-shadow(0 0 5px rgba(0, 121, 107, 0.5));
+        }
+        
+        /* -----------------------------------
             3 & 4. Security & Protection
             ----------------------------------- */
         * {
@@ -112,6 +127,15 @@
             display: block;
             transition: transform 0.3s;
             z-index: 2; 
+        }
+        
+        /* Preload the logo image */
+        .logo-preload {
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+            opacity: 0;
         }
         
         /* --- DUAL LOADER STYLES --- */
@@ -221,15 +245,24 @@
 </head>
 <body oncontextmenu="return false;">
 
+    <!-- Preload images -->
+    <div class="logo-preload">
+        <img src="Logo.png" alt="Preload Logo">
+        <img src="Stamp.png" alt="Preload Stamp">
+    </div>
+
+    <!-- Stamp in corner -->
+    <img src="Stamp.png" alt="Stamp" class="stamp">
+
     <div class="logo-container">
         <div class="loader-outer"></div> 
         <div class="loader-inner"></div> 
-        <img src="Logo.png" alt="M.E.T. Logo" class="logo">
+        <img src="Logo.png" alt="M.E.T Logo" class="logo">
     </div>
 
-    <h1>Welcome to M.E.T.</h1>
+    <h1>Welcome to M.E.T</h1>
     
-    <p>If the page content does not load automatically, please click the option/ link below - </p>
+    <p>If the page content does not load, please click the link below:</p>
     
     <p>
         <a href="About-Me.pdf">
@@ -238,6 +271,23 @@
     </p>
 
     <script>
+        /* -----------------------------------
+            Preload images to fix slow loading
+            ----------------------------------- */
+        function preloadImages() {
+            const images = ['Logo.png', 'Stamp.png'];
+            images.forEach(src => {
+                const img = new Image();
+                img.src = src;
+            });
+        }
+
+        // Preload images when page starts loading
+        window.addEventListener('load', preloadImages);
+        
+        // Also preload immediately
+        preloadImages();
+
         /* -----------------------------------
             1. JavaScript Controlled Redirect (3 Second Delay)
             ----------------------------------- */
@@ -272,4 +322,3 @@
     </script>
 </body>
 </html>
-
