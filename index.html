@@ -174,7 +174,7 @@
         }
         
         /* -----------------------------------
-            2. Logo & Loading Animation (FIXED FOR SCROLL JERK)
+            2. Logo & Loading Animation (Fixed for Uniformity)
             ----------------------------------- */
         .logo-container {
             position: relative;
@@ -187,8 +187,6 @@
             z-index: 1;
             /* Performance optimization */
             transform: translateZ(0);
-            /* Prevent any layout shifts */
-            contain: layout style paint;
         }
         
         .logo {
@@ -201,8 +199,6 @@
             z-index: 2; 
             /* Performance optimization */
             transform: translateZ(0);
-            /* Prevent any layout shifts */
-            contain: layout style paint;
         }
         
         /* Preload the logo image */
@@ -214,7 +210,7 @@
             opacity: 0;
         }
         
-        /* --- DUAL LOADER STYLES - FIXED FOR SCROLL JERK --- */
+        /* --- DUAL LOADER STYLES --- */
         .loader-outer {
             position: absolute; 
             top: -12px;
@@ -229,14 +225,9 @@
             border-bottom-color: var(--color-secondary);
             
             animation: rotation-clockwise 1.8s linear infinite;
-            /* Performance optimization - FIXED FOR SCROLL JERK */
+            /* Performance optimization */
             transform: translateZ(0);
             will-change: transform;
-            backface-visibility: hidden;
-            /* Prevent any layout shifts */
-            contain: layout style paint;
-            /* Use GPU for animation */
-            animation-timing-function: linear;
         }
 
         .loader-inner {
@@ -253,31 +244,26 @@
             border-top-color: var(--color-primary);
             
             animation: rotation-counterclockwise 1.2s linear infinite;
-            /* Performance optimization - FIXED FOR SCROLL JERK */
+            /* Performance optimization */
             transform: translateZ(0);
             will-change: transform;
-            backface-visibility: hidden;
-            /* Prevent any layout shifts */
-            contain: layout style paint;
-            /* Use GPU for animation */
-            animation-timing-function: linear;
         }
 
         @keyframes rotation-clockwise {
             0% {
-                transform: rotate(0deg) translateZ(0);
+                transform: rotate(0deg);
             }
             100% {
-                transform: rotate(360deg) translateZ(0);
+                transform: rotate(360deg);
             }
         }
 
         @keyframes rotation-counterclockwise {
             0% {
-                transform: rotate(0deg) translateZ(0);
+                transform: rotate(0deg);
             }
             100% {
-                transform: rotate(-360deg) translateZ(0);
+                transform: rotate(-360deg);
             }
         }
         /* --- END OF LOADER STYLES --- */
@@ -591,12 +577,6 @@
                 document.body.style.display = '';
             }, 250);
         });
-
-        // Optimize scroll performance for loader
-        window.addEventListener('scroll', function() {
-            // This ensures the loader stays smooth during scroll
-            // The CSS optimizations already handle this, but this is extra insurance
-        }, { passive: true });
         
     </script>
 </body>
