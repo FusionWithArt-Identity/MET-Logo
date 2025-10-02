@@ -9,20 +9,22 @@
 
     <style>
         /* -----------------------------------
-            CSS Variables for Responsive Sizing
-            ----------------------------------- */
+           CSS Variables for Responsive Sizing
+           ----------------------------------- */
         :root {
-            --logo-size: 150px; 
-            --loader-border: 6px; 
+            --logo-size: 150px; /* Base size for the logo/loader container */
+            --loader-border: 6px; /* Slightly thicker border for visibility */
             --color-primary: #00796b; /* Darker Cyan */
             --color-secondary: #004d40; /* Dark Teal */
         }
 
         /* -----------------------------------
-            1. Suble Cyan Gradient & Core Layout
-            ----------------------------------- */
+           1. Suble Cyan Gradient & Core Layout
+           ----------------------------------- */
         body {
+            /* Subtle Cyan Gradient (Blue-Green to Light Cyan) */
             background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
@@ -33,14 +35,15 @@
             min-height: 100vh;
             text-align: center;
             color: var(--color-secondary);
+            /* 6. High Compatibility/Responsiveness */
             box-sizing: border-box; 
         }
         
         /* -----------------------------------
-            3 & 4. Security & Protection
-            ----------------------------------- */
+           3 & 4. Security & Protection
+           ----------------------------------- */
         * {
-            user-select: none;
+            user-select: none; /* Prevent selection/dragging */
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
@@ -48,9 +51,10 @@
         }
         
         /* -----------------------------------
-            2. Logo & Loading Animation (Fixed for Uniformity)
-            ----------------------------------- */
+           2. Logo & Loading Animation (Tightly Clumped)
+           ----------------------------------- */
         .logo-container {
+            /* This div wraps the logo and the loader for tight clumping */
             position: relative;
             width: var(--logo-size);
             height: var(--logo-size);
@@ -58,97 +62,56 @@
             display: flex; 
             justify-content: center;
             align-items: center;
-            /* Add perspective to the container so children elements can have 3D transforms */
-            perspective: 1000px; 
         }
-
+        
         .logo {
-            max-width: 90%; 
+            max-width: 90%; /* Keep logo slightly smaller than container to show border */
             height: auto;
             border-radius: 50%;
             display: block;
-            /* Ensure the logo is in the middle z-index wise */
-            z-index: 10; 
-            position: relative; /* Needed for z-index to work against absolutely positioned elements */
-            box-shadow: 0 0 15px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+            /* Remove pulse/shadow animation */
+            transition: transform 0.3s;
+            z-index: 2; /* Ensure logo is on top of the animation */
         }
-
-        /* --- LOADER STYLES (Professional 3D Orbiting around Logo) --- */
+        
+        /* --- YOUR CUSTOM LOADER STYLES ADAPTED --- */
         .loader {
-            position: absolute;
-            /* Center the loader over the logo */
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotateZ(45deg); /* Center and initial rotation */
-            width: var(--logo-size); /* Loader dimensions match logo container */
+            position: absolute; /* Position relative to .logo-container */
+            top: 0;
+            left: 0;
+            width: var(--logo-size);
             height: var(--logo-size);
             border-radius: 50%;
-            /* Set color for the main orbiting "dot" */
-            color: var(--color-primary); 
-
-            /* This scales the orbiting dots based on the loader's overall size */
-            font-size: calc(var(--logo-size) / 3.5); /* Adjust dot size relative to logo */
+            box-sizing: border-box;
+            z-index: 1; /* Keep loader behind the logo image */
             
-            /* Important for layering: ensure parts of the loader can go behind/in front of the logo */
-            transform-style: preserve-3d;
+            /* The main spinner */
+            border-top: var(--loader-border) solid var(--color-primary); /* Cyan top half */
+            border-right: var(--loader-border) solid transparent;
+            animation: rotation 1s linear infinite;
         }
 
-        .loader:before,
-        .loader:after {
-            content: '';
-            display: block;
+        .loader::after {
+            content: '';  
+            box-sizing: border-box;
             position: absolute;
-            /* Position dots relative to the center of the loader */
-            top: 50%;
-            left: 50%;
-            width: 0.2em; /* Size of the dot */
-            height: 0.2em; /* Size of the dot */
+            left: 0;
+            top: 0;
+            width: var(--logo-size);
+            height: var(--logo-size);
             border-radius: 50%;
-            background-color: currentcolor; /* Uses the color property of .loader or .loader:after */
-            box-shadow: 0 0 5px rgba(0,0,0,0.3); /* Subtle shadow for the dots */
             
-            /* Center the dot itself */
-            margin-left: -0.1em; 
-            margin-top: -0.1em;
-
-            animation: spin 1.5s linear infinite; /* Slightly slower for better visual */
-            /* Crucial for 3D depth: rotate the *orbit* itself, not just the dot */
-            transform-origin: 0 0; 
+            /* The secondary spinner (subtle, using background colors) */
+            border-bottom: var(--loader-border) solid var(--color-secondary); /* Dark teal bottom half */
+            border-left: var(--loader-border) solid transparent;
         }
 
-        .loader:before {
-            /* First orbit, tilted on the X-axis */
-            transform: rotateX(70deg); /* This rotation applies to the orbital plane */
-        }
-
-        .loader:after {
-            /* Second orbit, tilted on the Y-axis with a different color and delay */
-            color: var(--color-secondary); /* Use the secondary theme color for the second dot */
-            transform: rotateY(70deg); /* This rotation applies to the orbital plane */
-            animation-delay: .75s; /* Half the total animation time */
-        }
-
-        /* Keyframes for the orbiting dots animation */
-        @keyframes spin {
+        @keyframes rotation {
             0% {
-                transform: rotate(0deg) translateX(calc(var(--logo-size) * 0.45)); /* Orbit radius */
-                opacity: 0.8;
-            }
-            25% {
-                transform: rotate(90deg) translateX(calc(var(--logo-size) * 0.45));
-                opacity: 1;
-            }
-            50% {
-                transform: rotate(180deg) translateX(calc(var(--logo-size) * 0.45));
-                opacity: 0.8;
-            }
-            75% {
-                transform: rotate(270deg) translateX(calc(var(--logo-size) * 0.45));
-                opacity: 1;
+                transform: rotate(0deg);
             }
             100% {
-                transform: rotate(360deg) translateX(calc(var(--logo-size) * 0.45));
-                opacity: 0.8;
+                transform: rotate(360deg);
             }
         }
         /* --- END OF LOADER STYLES --- */
@@ -183,8 +146,8 @@
         }
 
         /* -----------------------------------
-            3. Prevent Printout (via CSS)
-            ----------------------------------- */
+           3. Prevent Printout (via CSS)
+           ----------------------------------- */
         @media print {
             * {
                 display: none !important;
@@ -211,8 +174,8 @@
 
     <script>
         /* -----------------------------------
-            1. JavaScript Controlled Redirect (3 Second Delay)
-            ----------------------------------- */
+           1. JavaScript Controlled Redirect (3 Second Delay)
+           ----------------------------------- */
         const redirectDelay = 3000; 
         const targetURL = 'About-Me.pdf';
 
@@ -222,10 +185,12 @@
 
 
         /* -----------------------------------
-            4. Disable Shortcut Keys (Meta Keys, Ctrl, Alt)
-            ----------------------------------- */
+           4. Disable Shortcut Keys (Meta Keys, Ctrl, Alt)
+           ----------------------------------- */
         document.onkeydown = function(e) {
+            // Check for Ctrl/Cmd, Shift, Alt/Option
             if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) {
+                // Check common shortcut keys (e.g., C, P, S, U, I, J, F12)
                 if (
                     e.key === 'c' || e.key === 'p' || e.key === 's' || e.key === 'u' ||
                     e.key === 'i' || e.key === 'j' || e.key === 'F12'
