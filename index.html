@@ -192,12 +192,18 @@
 
 
         /* Responsive Text */
+        /* MODIFIED H1 STYLE FOR 3D EFFECT */
         h1 {
             font-size: clamp(1.8rem, 5vw, 3rem); 
             margin-bottom: 10px;
             color: #e0f7fa;
-            text-shadow: 0 0 10px rgba(0, 121, 107, 0.5);
             z-index: 1;
+            font-weight: bold;
+            text-shadow: 
+                1px 1px 0px var(--color-secondary),
+                2px 2px 0px var(--color-secondary),
+                3px 3px 0px var(--color-secondary),
+                4px 4px 8px rgba(0,0,0,0.5);
         }
         
         p {
@@ -245,13 +251,11 @@
 </head>
 <body oncontextmenu="return false;">
 
-    <!-- Preload images -->
     <div class="logo-preload">
         <img src="Logo.png" alt="Preload Logo">
         <img src="Stamp.png" alt="Preload Stamp">
     </div>
 
-    <!-- Stamp in corner -->
     <img src="Stamp.png" alt="Stamp" class="stamp">
 
     <div class="logo-container">
@@ -322,5 +326,3 @@
     </script>
 </body>
 </html>
-
-
