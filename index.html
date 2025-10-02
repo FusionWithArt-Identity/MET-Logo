@@ -112,7 +112,7 @@
             z-index: 0;
             /* Performance optimization */
             will-change: opacity;
-            /* FIX: Add transform to ensure this element is also on a stable layer */
+            /* Stabilization */
             transform: translateZ(-1px);
         }
 
@@ -177,7 +177,7 @@
         
         /* -----------------------------------
             2. Logo & Loading Animation (FIXED BORDER ERASURE)
-            --- FIX FOR MOBILE JANK STARTS HERE ---
+            --- FINAL FIX FOR MOBILE JANK ---
             ----------------------------------- */
         .logo-container {
             position: relative;
@@ -187,10 +187,10 @@
             display: flex; 
             justify-content: center;
             align-items: center;
-            z-index: 100; /* Increased to ensure it's above everything else */
+            z-index: 100; 
             /* Performance optimization */
             transform: translateZ(0);
-            /* New: More aggressive layer promotion */
+            /* Layer promotion */
             transform-style: preserve-3d; 
             will-change: transform, z-index;
         }
@@ -225,17 +225,16 @@
             bottom: -12px;
             border-radius: 50%;
             box-sizing: border-box;
-            z-index: 10; /* Boosted z-index */
+            z-index: 10; 
             
             border: var(--loader-border) solid transparent;
             border-bottom-color: var(--color-secondary);
             
             animation: rotation-clockwise 1.8s linear infinite;
-            /* FIX: Use aggressive 3D translation to force a high-performance layer */
+            /* Aggressive 3D translation for layer stability */
             transform: translate3d(0, 0, 10px); 
             will-change: transform;
             backface-visibility: hidden;
-            /* Ensure borders are fully visible */
             overflow: visible;
         }
 
@@ -247,25 +246,23 @@
             height: 100%;
             border-radius: 50%;
             box-sizing: border-box;
-            z-index: 10; /* Boosted z-index */
+            z-index: 10; 
             
             border: var(--loader-border) solid rgba(224, 247, 250, 0.1);
             border-top-color: var(--color-primary);
             
             animation: rotation-counterclockwise 1.2s linear infinite;
-            /* FIX: Use aggressive 3D translation to force a high-performance layer */
+            /* Aggressive 3D translation for layer stability */
             transform: translate3d(0, 0, 10px);
             will-change: transform;
             backface-visibility: hidden;
-            /* Ensure borders are fully visible */
             overflow: visible;
         }
-        /* --- END OF LOADER STYLES --- */
-        /* --- FIX FOR MOBILE JANK ENDS HERE --- */
         
+        /* NOTE: The translate3d is now integrated into the keyframes to ensure it persists */
         @keyframes rotation-clockwise {
             0% {
-                transform: rotate(0deg) translate3d(0, 0, 10px); /* Applied translate3d here too */
+                transform: rotate(0deg) translate3d(0, 0, 10px);
             }
             100% {
                 transform: rotate(360deg) translate3d(0, 0, 10px);
@@ -274,12 +271,13 @@
 
         @keyframes rotation-counterclockwise {
             0% {
-                transform: rotate(0deg) translate3d(0, 0, 10px); /* Applied translate3d here too */
+                transform: rotate(0deg) translate3d(0, 0, 10px);
             }
             100% {
                 transform: rotate(-360deg) translate3d(0, 0, 10px);
             }
         }
+        /* --- END OF LOADER STYLES --- */
 
 
         /* Responsive Text */
@@ -591,24 +589,10 @@
             }, 250);
         });
 
-        // Prevent animation restart by maintaining animation state
-        const loaderElements = document.querySelectorAll('.loader-outer, .loader-inner');
-        
-        // Force continuous animation
-        function maintainAnimations() {
-            loaderElements.forEach(loader => {
-                // Get current animation state and reapply to prevent restarts
-                const animation = getComputedStyle(loader).animation;
-                loader.style.animation = 'none';
-                // Force reflow
-                loader.offsetHeight;
-                loader.style.animation = animation;
-            });
-        }
-
-        // Fix: Removed 'passive: true' for scroll/resize to potentially prevent interaction conflicts
-        window.addEventListener('scroll', maintainAnimations); 
-        window.addEventListener('resize', maintainAnimations);
+        /* -----------------------------------
+            *** REMOVED: Animation maintenance JavaScript ***
+            The logic below was forcing animation restarts and causing the jerk.
+        ----------------------------------- */
         
     </script>
 </body>
