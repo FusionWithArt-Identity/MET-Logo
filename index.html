@@ -12,8 +12,8 @@
            CSS Variables for Responsive Sizing
            ----------------------------------- */
         :root {
-            --logo-size: 150px; /* Base size for the logo/loader container */
-            --loader-border: 6px; /* Slightly thicker border for visibility */
+            --logo-size: 150px; 
+            --loader-border: 6px; 
             --color-primary: #00796b; /* Darker Cyan */
             --color-secondary: #004d40; /* Dark Teal */
         }
@@ -22,9 +22,7 @@
            1. Suble Cyan Gradient & Core Layout
            ----------------------------------- */
         body {
-            /* Subtle Cyan Gradient (Blue-Green to Light Cyan) */
             background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
-            
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px;
@@ -35,7 +33,6 @@
             min-height: 100vh;
             text-align: center;
             color: var(--color-secondary);
-            /* 6. High Compatibility/Responsiveness */
             box-sizing: border-box; 
         }
         
@@ -43,7 +40,7 @@
            3 & 4. Security & Protection
            ----------------------------------- */
         * {
-            user-select: none; /* Prevent selection/dragging */
+            user-select: none;
             -webkit-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
@@ -51,10 +48,9 @@
         }
         
         /* -----------------------------------
-           2. Logo & Loading Animation (Tightly Clumped)
+           2. Logo & Loading Animation (Fixed for Uniformity)
            ----------------------------------- */
         .logo-container {
-            /* This div wraps the logo and the loader for tight clumping */
             position: relative;
             width: var(--logo-size);
             height: var(--logo-size);
@@ -65,46 +61,35 @@
         }
         
         .logo {
-            max-width: 90%; /* Keep logo slightly smaller than container to show border */
+            max-width: 90%; 
             height: auto;
             border-radius: 50%;
             display: block;
-            /* Remove pulse/shadow animation */
             transition: transform 0.3s;
-            z-index: 2; /* Ensure logo is on top of the animation */
+            z-index: 2; 
         }
         
-        /* --- YOUR CUSTOM LOADER STYLES ADAPTED --- */
+        /* --- LOADER STYLES (Simplified for Uniformity) --- */
         .loader {
-            position: absolute; /* Position relative to .logo-container */
+            position: absolute; 
             top: 0;
             left: 0;
             width: var(--logo-size);
             height: var(--logo-size);
             border-radius: 50%;
             box-sizing: border-box;
-            z-index: 1; /* Keep loader behind the logo image */
+            z-index: 1; 
             
-            /* The main spinner */
-            border-top: var(--loader-border) solid var(--color-primary); /* Cyan top half */
-            border-right: var(--loader-border) solid transparent;
-            animation: rotation 1s linear infinite;
+            /* Background color border (the invisible part of the track) */
+            border: var(--loader-border) solid #e0f7fa; /* Match loader background to body gradient lighter end */
+
+            /* The visible, animating arc */
+            border-top-color: var(--color-primary); /* Cyan arc */
+            
+            animation: rotation 1s linear infinite; /* Rotation is linear and infinite */
         }
 
-        .loader::after {
-            content: '';  
-            box-sizing: border-box;
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: var(--logo-size);
-            height: var(--logo-size);
-            border-radius: 50%;
-            
-            /* The secondary spinner (subtle, using background colors) */
-            border-bottom: var(--loader-border) solid var(--color-secondary); /* Dark teal bottom half */
-            border-left: var(--loader-border) solid transparent;
-        }
+        /* REMOVED ::after pseudo-element to ensure a single, uniform rotation path */
 
         @keyframes rotation {
             0% {
@@ -188,9 +173,7 @@
            4. Disable Shortcut Keys (Meta Keys, Ctrl, Alt)
            ----------------------------------- */
         document.onkeydown = function(e) {
-            // Check for Ctrl/Cmd, Shift, Alt/Option
             if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) {
-                // Check common shortcut keys (e.g., C, P, S, U, I, J, F12)
                 if (
                     e.key === 'c' || e.key === 'p' || e.key === 's' || e.key === 'u' ||
                     e.key === 'i' || e.key === 'j' || e.key === 'F12'
