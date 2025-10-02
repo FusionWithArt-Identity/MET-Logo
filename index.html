@@ -21,21 +21,21 @@
         /* Mobile-first responsive adjustments */
         @media (max-width: 768px) and (orientation: portrait) {
             :root {
-                --logo-size: 150px; /* INCREASEED from 120px */
+                --logo-size: 150px; /* INCREASED from 120px */
                 --loader-border: 5px;
             }
         }
         
         @media (max-width: 480px) {
             :root {
-                --logo-size: 130px; /* INCREASEED from 100px */
+                --logo-size: 130px; /* INCREASED from 100px */
                 --loader-border: 4px;
             }
         }
 
         @media (max-height: 500px) and (orientation: landscape) {
             :root {
-                --logo-size: 110px; /* INCREASEED from 90px */
+                --logo-size: 110px; /* INCREASED from 90px */
             }
         }
 
@@ -57,8 +57,6 @@
             color: #e0f7fa;
             box-sizing: border-box;
             position: relative;
-            /* Enable fast, fluid scrolling on touch devices */
-            -webkit-overflow-scrolling: touch; 
             overflow-x: hidden;
             overflow-y: auto;
             /* Performance optimization */
@@ -67,6 +65,8 @@
             transform: translateZ(0);
             backface-visibility: hidden;
             perspective: 1000;
+            /* Ensuring fluid scroll */
+            -webkit-overflow-scrolling: touch; 
         }
 
         /* Main content container for better control */
@@ -80,8 +80,6 @@
             padding: 20px;
             position: relative;
             z-index: 1;
-            /* Ensure the content is always scrollable */
-            min-height: 90vh; 
         }
 
         /* Digital grid overlay - simplified for performance */
@@ -125,15 +123,14 @@
         }
         
         /* -----------------------------------
-            Stamp Image in Corner - INCREASED SIZE
+            Stamp Image in Corner
             ----------------------------------- */
         .stamp {
             position: fixed;
             top: 20px;
             right: 20px;
-            width: 100px; /* INCREASED from 80px */
-            height: 100px; /* INCREASED from 80px */
-            /* UPDATED: Increased tilt to 25 degrees */
+            width: 100px; 
+            height: 100px; 
             transform: rotate(25deg);
             opacity: 0.9;
             z-index: 10;
@@ -146,15 +143,15 @@
         /* Responsive stamp sizing */
         @media (max-width: 768px) {
             .stamp {
-                width: 80px; /* INCREASED from 60px */
-                height: 80px; /* INCREASED from 60px */
+                width: 80px; 
+                height: 80px; 
             }
         }
         
         @media (max-width: 480px) {
             .stamp {
-                width: 70px; /* INCREASED from 50px */
-                height: 70px; /* INCREASED from 50px */
+                width: 70px; 
+                height: 70px; 
             }
         }
         
@@ -180,44 +177,25 @@
         }
         
         /* -----------------------------------
-            2. Logo & Loading Animation (The Final Fix)
+            2. Logo & Loading Animation (Final Stable Fix)
             ----------------------------------- */
-        /* CRITICAL FIX: The loader is now positioned using `position: fixed` in this wrapper.
-           This ensures it is NEVER affected by the page's scroll or overscroll,
-           while `top: 0`, `left: 0`, `right: 0`, `bottom: 0` ensures it is centered.
-           Its children use `margin: auto` to center the actual logo in this fixed box. */
-        .loader-isolation-wrapper {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            z-index: 100; /* Must be high */
-            pointer-events: none; /* Allows clicks to pass through to the content below */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            /* Final GPU Layer Promotion */
-            will-change: transform;
-            transform: translateZ(9999px); 
-        }
-
         .logo-container {
-            /* Now RELATIVE to the fixed wrapper, but its position within the wrapper is controlled by margin: auto */
-            position: relative; 
+            position: relative;
             width: var(--logo-size);
             height: var(--logo-size);
-            /* Centering the logo within the fixed wrapper */
-            margin: auto 0 25px 0; 
+            margin-bottom: 25px;
             display: flex; 
             justify-content: center;
             align-items: center;
-            /* Restore pointer events for logo interactions (like the redirect click) */
-            pointer-events: auto; 
+            z-index: 100; 
+            
+            /* CRITICAL FIX: Forces a new, stable stacking context and rendering layer */
+            isolation: isolate; 
             
             /* Performance optimization */
             transform-style: preserve-3d; 
             will-change: transform, z-index;
+            transform: translateZ(0);
         }
         
         .logo {
@@ -279,7 +257,7 @@
             overflow: visible;
         }
         
-        /* IMPORTANT: Keeping the translate3d in keyframes for stability */
+        /* IMPORTANT: Maintaining translate3d in keyframes for persistent GPU acceleration */
         @keyframes rotation-clockwise {
             0% {
                 transform: rotate(0deg) translate3d(0, 0, 10px);
@@ -347,7 +325,7 @@
         }
 
         /* Ensure content stays above background effects */
-        .content-container > *:not(.loader-isolation-wrapper) {
+        .logo-container, h1, p, a {
             position: relative;
             z-index: 1;
         }
@@ -373,12 +351,8 @@
                 padding: 10px 0;
             }
             
-            /* Adjust logo position in landscape */
-            .loader-isolation-wrapper {
-                 align-items: flex-start;
-            }
             .logo-container {
-                margin: 0 auto 15px auto;
+                margin-bottom: 15px;
             }
             
             h1 {
@@ -437,15 +411,13 @@
 
     <img src="Stamp.png" alt="Stamp" class="stamp">
 
-    <div class="loader-isolation-wrapper">
+    <div class="content-container">
         <div class="logo-container">
             <div class="loader-outer"></div> 
             <div class="loader-inner"></div> 
             <img src="Logo.png" alt="M.E.T. Logo" class="logo">
         </div>
-    </div>
 
-    <div class="content-container">
         <h1>Welcome to M.E.T.</h1>
         
         <p>If the page content does not load automatically, please click the option/ link below - </p>
@@ -578,18 +550,7 @@
             return false;
         });
         
-        // Handle orientation changes for better performance
-        // FIX: Removed the JS that was forcing reflows (display: none and offsetHeight)
-        window.addEventListener('orientationchange', function() {
-            // In modern browsers, simple CSS media queries handle this best.
-            // This listener is now effectively a placeholder.
-        });
-
-        // Handle resize events for dynamic responsiveness
-        // FIX: Removed the heavy JS timeout that forced body reflows on resize.
-        window.addEventListener('resize', function() {
-            // No action needed here. CSS is now handling the responsiveness.
-        });
+        // Removed all previous, performance-damaging JS for orientation and resize to ensure fluidity.
         
     </script>
 </body>
