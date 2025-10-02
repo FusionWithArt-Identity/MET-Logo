@@ -9,6 +9,16 @@
 
     <style>
         /* -----------------------------------
+           CSS Variables for Responsive Sizing
+           ----------------------------------- */
+        :root {
+            --logo-size: 150px; /* Base size for the logo/loader container */
+            --loader-border: 6px; /* Slightly thicker border for visibility */
+            --color-primary: #00796b; /* Darker Cyan */
+            --color-secondary: #004d40; /* Dark Teal */
+        }
+
+        /* -----------------------------------
            1. Suble Cyan Gradient & Core Layout
            ----------------------------------- */
         body {
@@ -24,13 +34,13 @@
             align-items: center;
             min-height: 100vh;
             text-align: center;
-            color: #004d40; /* Dark Teal text for contrast */
+            color: var(--color-secondary);
             /* 6. High Compatibility/Responsiveness */
-            box-sizing: border-box; /* Include padding in the element's total width and height */
+            box-sizing: border-box; 
         }
         
         /* -----------------------------------
-           3 & 4. Security & Protection (Prevent Drag, Copy, Print, Shortcuts)
+           3 & 4. Security & Protection
            ----------------------------------- */
         * {
             user-select: none; /* Prevent selection/dragging */
@@ -41,56 +51,97 @@
         }
         
         /* -----------------------------------
-           2. Logo & Loading Animation
+           2. Logo & Loading Animation (Tightly Clumped)
            ----------------------------------- */
         .logo-container {
-            /* The element that will spin/animate */
+            /* This div wraps the logo and the loader for tight clumping */
             position: relative;
-            width: 150px;
-            height: 150px;
+            width: var(--logo-size);
+            height: var(--logo-size);
             margin-bottom: 25px;
-            animation: spin 1.5s linear infinite; /* Apply spin animation */
+            display: flex; 
+            justify-content: center;
+            align-items: center;
         }
         
         .logo {
-            max-width: 100%;
+            max-width: 90%; /* Keep logo slightly smaller than container to show border */
             height: auto;
-            border-radius: 50%; /* Make the image itself circular */
+            border-radius: 50%;
             display: block;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+            /* Remove pulse/shadow animation */
+            transition: transform 0.3s;
+            z-index: 2; /* Ensure logo is on top of the animation */
         }
         
-        /* Keyframes for the Spinning Animation */
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        /* --- YOUR CUSTOM LOADER STYLES ADAPTED --- */
+        .loader {
+            position: absolute; /* Position relative to .logo-container */
+            top: 0;
+            left: 0;
+            width: var(--logo-size);
+            height: var(--logo-size);
+            border-radius: 50%;
+            box-sizing: border-box;
+            z-index: 1; /* Keep loader behind the logo image */
+            
+            /* The main spinner */
+            border-top: var(--loader-border) solid var(--color-primary); /* Cyan top half */
+            border-right: var(--loader-border) solid transparent;
+            animation: rotation 1s linear infinite;
         }
+
+        .loader::after {
+            content: '';  
+            box-sizing: border-box;
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: var(--logo-size);
+            height: var(--logo-size);
+            border-radius: 50%;
+            
+            /* The secondary spinner (subtle, using background colors) */
+            border-bottom: var(--loader-border) solid var(--color-secondary); /* Dark teal bottom half */
+            border-left: var(--loader-border) solid transparent;
+        }
+
+        @keyframes rotation {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        /* --- END OF LOADER STYLES --- */
+
 
         /* Responsive Text */
         h1 {
-            font-size: clamp(1.8rem, 5vw, 3rem); /* Dynamic font size */
+            font-size: clamp(1.8rem, 5vw, 3rem); 
             margin-bottom: 10px;
-            color: #00796b; /* Darker Cyan */
+            color: var(--color-primary);
         }
         
         p {
-            font-size: clamp(1rem, 2vw, 1.2rem); /* Dynamic font size */
+            font-size: clamp(1rem, 2vw, 1.2rem); 
             margin-top: 5px;
         }
         
         a {
-            color: #004d40;
+            color: var(--color-secondary);
             text-decoration: none;
             font-weight: bold;
             display: inline-block;
             margin-top: 10px;
             padding: 5px 10px;
-            border: 2px solid #004d40;
+            border: 2px solid var(--color-secondary);
             border-radius: 4px;
             transition: background-color 0.3s, color 0.3s;
         }
         a:hover {
-            background-color: #004d40;
+            background-color: var(--color-secondary);
             color: #ffffff;
         }
 
@@ -105,7 +156,9 @@
     </style>
 </head>
 <body oncontextmenu="return false;">
+
     <div class="logo-container">
+        <div class="loader"></div> 
         <img src="Logo.png" alt="M.E.T Logo" class="logo">
     </div>
 
@@ -123,11 +176,9 @@
         /* -----------------------------------
            1. JavaScript Controlled Redirect (3 Second Delay)
            ----------------------------------- */
-        // Set the delay in milliseconds (3 seconds)
         const redirectDelay = 3000; 
         const targetURL = 'About-Me.pdf';
 
-        // Wait for 3 seconds then redirect
         setTimeout(() => {
             window.location.href = targetURL;
         }, redirectDelay);
