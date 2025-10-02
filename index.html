@@ -9,8 +9,8 @@
 
     <style>
         /* -----------------------------------
-           CSS Variables for Responsive Sizing
-           ----------------------------------- */
+            CSS Variables for Responsive Sizing
+            ----------------------------------- */
         :root {
             --logo-size: 150px; 
             --loader-border: 6px; 
@@ -19,8 +19,8 @@
         }
 
         /* -----------------------------------
-           1. Suble Cyan Gradient & Core Layout
-           ----------------------------------- */
+            1. Suble Cyan Gradient & Core Layout
+            ----------------------------------- */
         body {
             background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -37,8 +37,8 @@
         }
         
         /* -----------------------------------
-           3 & 4. Security & Protection
-           ----------------------------------- */
+            3 & 4. Security & Protection
+            ----------------------------------- */
         * {
             user-select: none;
             -webkit-user-select: none;
@@ -48,8 +48,8 @@
         }
         
         /* -----------------------------------
-           2. Logo & Loading Animation (Fixed for Uniformity)
-           ----------------------------------- */
+            2. Logo & Loading Animation (Fixed for Uniformity)
+            ----------------------------------- */
         .logo-container {
             position: relative;
             width: var(--logo-size);
@@ -69,34 +69,73 @@
             z-index: 2; 
         }
         
-        /* --- LOADER STYLES (Simplified for Uniformity) --- */
+        /* --- LOADER STYLES (Professional 3D Orbit) --- */
         .loader {
-            position: absolute; 
+            position: absolute;
             top: 0;
             left: 0;
             width: var(--logo-size);
             height: var(--logo-size);
             border-radius: 50%;
-            box-sizing: border-box;
-            z-index: 1; 
-            
-            /* Background color border (the invisible part of the track) */
-            border: var(--loader-border) solid #e0f7fa; /* Match loader background to body gradient lighter end */
+            perspective: 1000px; /* Enable 3D space for the orbits */
+            transform: rotateZ(45deg);
+            color: var(--color-primary); /* Set color for the first orbit */
 
-            /* The visible, animating arc */
-            border-top-color: var(--color-primary); /* Cyan arc */
-            
-            animation: rotation 1s linear infinite; /* Rotation is linear and infinite */
+            /* This scales the orbiting dots based on the loader's overall size */
+            font-size: calc(var(--logo-size) / 3.5); 
         }
 
-        /* REMOVED ::after pseudo-element to ensure a single, uniform rotation path */
+        .loader:before,
+        .loader:after {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: inherit;
+            height: inherit;
+            border-radius: 50%;
+            animation: 1s spin linear infinite;
+        }
 
-        @keyframes rotation {
-            0% {
-                transform: rotate(0deg);
-            }
+        .loader:before {
+            /* First orbit, tilted on the X-axis */
+            transform: rotateX(70deg);
+        }
+
+        .loader:after {
+            /* Second orbit, tilted on the Y-axis with a different color and delay */
+            color: var(--color-secondary); /* Use the secondary theme color */
+            transform: rotateY(70deg);
+            animation-delay: .4s;
+        }
+
+        /* Keyframes for the orbiting dots animation */
+        @keyframes spin {
+            0%,
             100% {
-                transform: rotate(360deg);
+                box-shadow: .2em 0px 0 0px currentcolor;
+            }
+            12% {
+                box-shadow: .2em .2em 0 0 currentcolor;
+            }
+            25% {
+                box-shadow: 0 .2em 0 0px currentcolor;
+            }
+            37% {
+                box-shadow: -.2em .2em 0 0 currentcolor;
+            }
+            50% {
+                box-shadow: -.2em 0 0 0 currentcolor;
+            }
+            62% {
+                box-shadow: -.2em -.2em 0 0 currentcolor;
+            }
+            75% {
+                box-shadow: 0px -.2em 0 0 currentcolor;
+            }
+            87% {
+                box-shadow: .2em -.2em 0 0 currentcolor;
             }
         }
         /* --- END OF LOADER STYLES --- */
@@ -131,8 +170,8 @@
         }
 
         /* -----------------------------------
-           3. Prevent Printout (via CSS)
-           ----------------------------------- */
+            3. Prevent Printout (via CSS)
+            ----------------------------------- */
         @media print {
             * {
                 display: none !important;
@@ -159,8 +198,8 @@
 
     <script>
         /* -----------------------------------
-           1. JavaScript Controlled Redirect (3 Second Delay)
-           ----------------------------------- */
+            1. JavaScript Controlled Redirect (3 Second Delay)
+            ----------------------------------- */
         const redirectDelay = 3000; 
         const targetURL = 'About-Me.pdf';
 
@@ -170,8 +209,8 @@
 
 
         /* -----------------------------------
-           4. Disable Shortcut Keys (Meta Keys, Ctrl, Alt)
-           ----------------------------------- */
+            4. Disable Shortcut Keys (Meta Keys, Ctrl, Alt)
+            ----------------------------------- */
         document.onkeydown = function(e) {
             if (e.ctrlKey || e.shiftKey || e.altKey || e.metaKey) {
                 if (
