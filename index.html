@@ -123,7 +123,7 @@
         }
         
         /* -----------------------------------
-            Stamp Image in Corner - Enhanced with Dragging
+            Stamp Image in Corner - COMPLETELY LOCKED (No Dragging)
             ----------------------------------- */
         .stamp {
             position: fixed;
@@ -138,29 +138,17 @@
             /* Performance optimization */
             will-change: transform;
             transform: translateZ(0);
-            /* Dragging enabled for desktop */
-            cursor: grab;
+            /* DRAGGING COMPLETELY DISABLED - just like logo */
+            cursor: default;
             transition: transform 0.2s ease, filter 0.2s ease;
         }
 
         .stamp:active {
-            cursor: grabbing;
-            transform: rotate(25deg) scale(1.05);
-            filter: drop-shadow(0 0 8px rgba(0, 121, 107, 0.7));
+            cursor: default;
+            transform: rotate(25deg);
+            filter: drop-shadow(0 0 5px rgba(0, 121, 107, 0.5));
         }
 
-        /* Disable dragging on mobile devices */
-        @media (max-width: 768px) {
-            .stamp {
-                cursor: default;
-            }
-            .stamp:active {
-                cursor: default;
-                transform: rotate(25deg);
-                filter: drop-shadow(0 0 5px rgba(0, 121, 107, 0.5));
-            }
-        }
-        
         /* Responsive stamp sizing */
         @media (max-width: 768px) {
             .stamp {
@@ -548,82 +536,19 @@
         preloadImages();
 
         /* -----------------------------------
-            Enhanced Stamp Dragging Functionality
+            Stamp Dragging COMPLETELY DISABLED (Just like logo)
             ----------------------------------- */
         function initStampDragging() {
             const stamp = document.getElementById('draggableStamp');
             if (!stamp) return;
 
-            let isDragging = false;
-            let startX, startY, initialX, initialY;
-
-            // Check if device is mobile
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-            if (isMobile) {
-                // Disable dragging on mobile
-                stamp.style.cursor = 'default';
-                return;
-            }
-
-            // Desktop dragging functionality
-            stamp.addEventListener('mousedown', startDrag);
-            document.addEventListener('mousemove', drag);
-            document.addEventListener('mouseup', stopDrag);
-
-            function startDrag(e) {
-                isDragging = true;
-                startX = e.clientX;
-                startY = e.clientY;
-                initialX = parseFloat(stamp.style.left) || stamp.offsetLeft;
-                initialY = parseFloat(stamp.style.top) || stamp.offsetTop;
-                stamp.style.transition = 'none';
-            }
-
-            function drag(e) {
-                if (!isDragging) return;
-                
-                e.preventDefault();
-                
-                const dx = e.clientX - startX;
-                const dy = e.clientY - startY;
-                
-                // Calculate new position with STRICT boundaries - PREVENT DRAGGING OUTSIDE VISIBLE AREA
-                const stampWidth = stamp.offsetWidth;
-                const stampHeight = stamp.offsetHeight;
-                
-                // Use document.body for boundaries instead of window
-                const maxX = document.body.clientWidth - stampWidth;
-                const maxY = document.body.clientHeight - stampHeight;
-                
-                // Ensure stamp stays completely within body boundaries
-                const newX = Math.max(0, Math.min(maxX, initialX + dx));
-                const newY = Math.max(0, Math.min(maxY, initialY + dy));
-                
-                stamp.style.left = newX + 'px';
-                stamp.style.top = newY + 'px';
-                stamp.style.right = 'auto';
-            }
-
-            function stopDrag() {
-                if (!isDragging) return;
-                isDragging = false;
-                stamp.style.transition = 'transform 0.2s ease, filter 0.2s ease';
-                
-                // Ensure final position is within bounds
-                const stampWidth = stamp.offsetWidth;
-                const stampHeight = stamp.offsetHeight;
-                const maxX = document.body.clientWidth - stampWidth;
-                const maxY = document.body.clientHeight - stampHeight;
-                
-                const currentX = parseFloat(stamp.style.left);
-                const currentY = parseFloat(stamp.style.top);
-                
-                if (currentX < 0) stamp.style.left = '0px';
-                if (currentY < 0) stamp.style.top = '0px';
-                if (currentX > maxX) stamp.style.left = maxX + 'px';
-                if (currentY > maxY) stamp.style.top = maxY + 'px';
-            }
+            // COMPLETELY DISABLE DRAGGING - Remove all dragging event listeners
+            // Stamp is now completely static like the logo
+            stamp.style.cursor = 'default';
+            
+            // Remove any existing dragging functionality
+            stamp.removeEventListener('mousedown', () => {});
+            stamp.removeEventListener('touchstart', () => {});
         }
 
         /* -----------------------------------
@@ -773,7 +698,7 @@
 
         // Initialize when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize stamp dragging
+            // Initialize stamp (with dragging completely disabled)
             initStampDragging();
             
             // Initialize the About-Me popup with 2 second delay
