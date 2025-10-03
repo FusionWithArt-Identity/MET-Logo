@@ -401,29 +401,31 @@
             font-weight: bold;
         }
 
-        /* NEW: Floating popup message */
-        .floating-popup {
+        /* NEW: Enhanced Floating Popup System */
+        .popup-balloon {
             position: absolute;
             bottom: 100%;
             left: 50%;
             transform: translateX(-50%);
-            background: rgba(0, 77, 64, 0.9);
-            color: #e0f7fa;
-            padding: 8px 12px;
-            border-radius: 8px;
+            background: #424242; /* Grey background */
+            color: #ffffff; /* White text */
+            padding: 10px 14px;
+            border-radius: 10px;
             font-size: 0.75rem;
-            width: 220px;
-            margin-bottom: 8px;
+            width: 240px;
+            margin-bottom: 6px;
             backdrop-filter: blur(5px);
-            border: 1px solid var(--color-primary);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            border: 1px solid #616161;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
+            transition: all 0.3s ease;
             z-index: 5;
+            text-align: center;
+            line-height: 1.4;
         }
 
-        .floating-popup::after {
+        .popup-balloon::after {
             content: '';
             position: absolute;
             top: 100%;
@@ -431,10 +433,10 @@
             transform: translateX(-50%);
             border-width: 6px;
             border-style: solid;
-            border-color: rgba(0, 77, 64, 0.9) transparent transparent transparent;
+            border-color: #424242 transparent transparent transparent;
         }
 
-        .floating-popup.show {
+        .popup-balloon.show {
             opacity: 1;
             visibility: visible;
         }
@@ -478,7 +480,7 @@
         <p>You are viewing this page that marks authenticity of the Product/ Service/ Content Created/ Maintained by Mihir's Echoing Tangency (M. E. T.).</p>
         
         <div class="button-container">
-            <div class="floating-popup" id="floatingPopup">
+            <div class="popup-balloon" id="PopUp1-About-Me">
                 If the page content does not load automatically, please click the option/ link below -
             </div>
             <a href="About-Me.pdf">
@@ -514,18 +516,80 @@
         preloadImages();
 
         /* -----------------------------------
+            Enhanced Popup Balloon System
+            ----------------------------------- */
+        const PopUpSystem = {
+            popups: {},
+            
+            // Initialize a popup
+            init: function(popupId, options = {}) {
+                const popup = document.getElementById(popupId);
+                if (popup) {
+                    this.popups[popupId] = {
+                        element: popup,
+                        autoHide: options.autoHide !== false,
+                        duration: options.duration || 5000,
+                        timer: null
+                    };
+                }
+            },
+            
+            // Show specific popup
+            show: function(popupId) {
+                const popupData = this.popups[popupId];
+                if (popupData && !this.isRedirecting) {
+                    popupData.element.classList.add('show');
+                    
+                    // Auto hide after duration
+                    if (popupData.autoHide) {
+                        if (popupData.timer) {
+                            clearTimeout(popupData.timer);
+                        }
+                        popupData.timer = setTimeout(() => {
+                            this.hide(popupId);
+                        }, popupData.duration);
+                    }
+                }
+            },
+            
+            // Hide specific popup
+            hide: function(popupId) {
+                const popupData = this.popups[popupId];
+                if (popupData) {
+                    popupData.element.classList.remove('show');
+                    if (popupData.timer) {
+                        clearTimeout(popupData.timer);
+                    }
+                }
+            },
+            
+            // Hide all popups
+            hideAll: function() {
+                Object.keys(this.popups).forEach(popupId => {
+                    this.hide(popupId);
+                });
+            },
+            
+            // Set redirecting state
+            setRedirecting: function(isRedirecting) {
+                this.isRedirecting = isRedirecting;
+                if (isRedirecting) {
+                    this.hideAll();
+                }
+            }
+        };
+
+        /* -----------------------------------
             1. JavaScript Controlled Redirect (3 Second Delay)
             ----------------------------------- */
         const redirectDelay = 3000; 
         const targetURL = 'About-Me.pdf';
         let countdownElement = document.querySelector('.countdown');
         let loadingMessage = document.getElementById('loadingMessage');
-        let floatingPopup = document.getElementById('floatingPopup');
         let countdownValue = 3;
         let redirectTimer;
         let countdownInterval;
         let hasRedirected = false;
-        let popupTimer;
         let userReturned = false;
 
         // Function to hide redirect message
@@ -539,21 +603,8 @@
             if (redirectTimer) {
                 clearTimeout(redirectTimer);
             }
-            if (popupTimer) {
-                clearTimeout(popupTimer);
-            }
-        }
-
-        // Function to show floating popup
-        function showFloatingPopup() {
-            if (floatingPopup && !hasRedirected) {
-                floatingPopup.classList.add('show');
-                
-                // Hide popup after 5 seconds
-                popupTimer = setTimeout(() => {
-                    floatingPopup.classList.remove('show');
-                }, 5000);
-            }
+            // Set redirecting state to false
+            PopUpSystem.setRedirecting(false);
         }
 
         // Function to handle user return to page
@@ -562,8 +613,8 @@
                 userReturned = true;
                 // User came back to the page - cancel auto redirect and hide redirect message
                 hideRedirectMessage();
-                // Show the floating popup immediately
-                showFloatingPopup();
+                // Show the popup balloon immediately
+                PopUpSystem.show('PopUp1-About-Me');
             }
         }
 
@@ -571,6 +622,9 @@
         function startRedirectProcess() {
             // Only start if we haven't redirected yet and user hasn't returned
             if (hasRedirected || userReturned) return;
+            
+            // Set redirecting state to true
+            PopUpSystem.setRedirecting(true);
             
             // Update countdown display
             countdownInterval = setInterval(() => {
@@ -592,6 +646,15 @@
                 }
             }, redirectDelay);
         }
+
+        // Initialize popup system when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize the About-Me popup
+            PopUpSystem.init('PopUp1-About-Me', {
+                autoHide: true,
+                duration: 5000
+            });
+        });
 
         // Check if page was hidden (user navigated away) and is now visible again
         document.addEventListener('visibilitychange', function() {
