@@ -486,7 +486,7 @@
             </a>
         </div>
 
-        <p class="loading-message">
+        <p class="loading-message" id="loadingMessage">
             Redirecting to Owner-Info (Abouts) in <span class="countdown">3</span> seconds...
         </p>
     </div>
@@ -519,14 +519,14 @@
         const redirectDelay = 3000; 
         const targetURL = 'About-Me.pdf';
         let countdownElement = document.querySelector('.countdown');
-        let loadingMessage = document.querySelector('.loading-message');
+        let loadingMessage = document.getElementById('loadingMessage');
         let floatingPopup = document.getElementById('floatingPopup');
         let countdownValue = 3;
         let redirectTimer;
         let countdownInterval;
         let hasRedirected = false;
         let popupTimer;
-        let userInteracted = false;
+        let userReturned = false;
 
         // Function to hide redirect message
         function hideRedirectMessage() {
@@ -542,16 +542,11 @@
             if (popupTimer) {
                 clearTimeout(popupTimer);
             }
-            // Hide the floating popup when redirect is cancelled
-            if (floatingPopup) {
-                floatingPopup.classList.remove('show');
-            }
         }
 
         // Function to show floating popup
         function showFloatingPopup() {
-            // Only show popup if user has interacted AND page is not redirecting
-            if (floatingPopup && userInteracted && !hasRedirected) {
+            if (floatingPopup && !hasRedirected) {
                 floatingPopup.classList.add('show');
                 
                 // Hide popup after 5 seconds
@@ -561,11 +556,11 @@
             }
         }
 
-        // Function to handle user interaction
-        function handleUserInteraction() {
-            if (!userInteracted && !hasRedirected) {
-                userInteracted = true;
-                // User came back to the page - cancel auto redirect
+        // Function to handle user return to page
+        function handleUserReturn() {
+            if (!userReturned) {
+                userReturned = true;
+                // User came back to the page - cancel auto redirect and hide redirect message
                 hideRedirectMessage();
                 // Show the floating popup immediately
                 showFloatingPopup();
@@ -574,8 +569,8 @@
 
         // Function to start redirect process
         function startRedirectProcess() {
-            // Only start if we haven't redirected yet
-            if (hasRedirected) return;
+            // Only start if we haven't redirected yet and user hasn't returned
+            if (hasRedirected || userReturned) return;
             
             // Update countdown display
             countdownInterval = setInterval(() => {
@@ -588,23 +583,15 @@
                 }
             }, 1000);
 
-            // DO NOT show floating popup automatically during normal redirect
-            // It will only show when user interacts
-
             // Set redirect timer
             redirectTimer = setTimeout(() => {
-                // Only redirect if user hasn't interacted
-                if (!userInteracted) {
+                // Only redirect if user hasn't returned
+                if (!userReturned) {
                     hasRedirected = true;
                     window.location.href = targetURL;
                 }
             }, redirectDelay);
         }
-
-        // Add event listeners for user interaction
-        document.addEventListener('click', handleUserInteraction);
-        document.addEventListener('touchstart', handleUserInteraction);
-        document.addEventListener('keydown', handleUserInteraction);
 
         // Check if page was hidden (user navigated away) and is now visible again
         document.addEventListener('visibilitychange', function() {
@@ -613,24 +600,30 @@
                 // Check if enough time has passed for the redirect to have occurred
                 if (performance.now() > redirectDelay) {
                     // User came back after redirect would have completed
-                    handleUserInteraction();
+                    handleUserReturn();
                 }
             }
         });
 
-        // Also check page load time to see if user is returning
+        // Check session storage to see if user is returning
         window.addEventListener('load', function() {
-            // If page takes more than redirectDelay to load, user probably navigated back
-            setTimeout(() => {
-                if (document.visibilityState === 'visible' && !hasRedirected) {
-                    // User likely navigated back after redirect would have completed
-                    handleUserInteraction();
-                }
-            }, redirectDelay + 100);
+            // Check if this is a page reload or back navigation
+            if (performance.navigation.type === 1 || performance.getEntriesByType("navigation")[0].type === 'back_forward') {
+                // This is a reload or back navigation - treat as user return
+                handleUserReturn();
+            } else {
+                // First visit - start normal redirect process
+                startRedirectProcess();
+            }
         });
 
-        // Start the redirect process
-        startRedirectProcess();
+        // Handle page show event (for back/forward navigation)
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                // Page was loaded from cache (back/forward navigation)
+                handleUserReturn();
+            }
+        });
 
         /* -----------------------------------
             4. Disable Shortcut Keys (Meta Keys, Ctrl, Alt)
