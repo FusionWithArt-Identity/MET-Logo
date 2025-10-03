@@ -400,6 +400,61 @@
             margin-left: 5px;
             font-weight: bold;
         }
+
+        /* NEW: Floating popup message */
+        .floating-popup {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 77, 64, 0.9);
+            color: #e0f7fa;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            width: 220px;
+            margin-bottom: 8px;
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--color-primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 5;
+        }
+
+        .floating-popup::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: rgba(0, 77, 64, 0.9) transparent transparent transparent;
+        }
+
+        .floating-popup.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .button-container {
+            position: relative;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        /* NEW: Footer styles */
+        .footer {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #80deea;
+            opacity: 0.7;
+            z-index: 1;
+            position: relative;
+            padding: 10px;
+        }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -420,17 +475,24 @@
 
         <h1>Welcome to M.E.T.</h1>
         
-        <p>If the page content does not load automatically, please click the option/ link below - </p>
+        <p>You are viewing this page that marks authenticity of the Product/ Service/ Content Created/ Maintained by Mihir's Echoing Tangency (M. E. T.).</p>
         
-        <p>
+        <div class="button-container">
+            <div class="floating-popup" id="floatingPopup">
+                If the page content does not load automatically, please click the option/ link below -
+            </div>
             <a href="About-Me.pdf">
                 Open About-Me.pdf
             </a>
-        </p>
+        </div>
 
         <p class="loading-message">
-            Redirecting in <span class="countdown">3</span> seconds...
+            Redirecting to Owner-Info (Abouts) in <span class="countdown">3</span> seconds...
         </p>
+    </div>
+
+    <div class="footer">
+        Crafted by Mriganka | © All Rights Reserved 2025–2026
     </div>
 
     <script>
@@ -458,10 +520,12 @@
         const targetURL = 'About-Me.pdf';
         let countdownElement = document.querySelector('.countdown');
         let loadingMessage = document.querySelector('.loading-message');
+        let floatingPopup = document.getElementById('floatingPopup');
         let countdownValue = 3;
         let redirectTimer;
         let countdownInterval;
         let hasRedirected = false;
+        let popupTimer;
 
         // Function to hide redirect message
         function hideRedirectMessage() {
@@ -473,6 +537,25 @@
             }
             if (redirectTimer) {
                 clearTimeout(redirectTimer);
+            }
+            if (popupTimer) {
+                clearTimeout(popupTimer);
+            }
+            // Hide the floating popup when redirect is cancelled
+            if (floatingPopup) {
+                floatingPopup.classList.remove('show');
+            }
+        }
+
+        // Function to show floating popup
+        function showFloatingPopup() {
+            if (floatingPopup && !hasRedirected) {
+                floatingPopup.classList.add('show');
+                
+                // Hide popup after 5 seconds
+                popupTimer = setTimeout(() => {
+                    floatingPopup.classList.remove('show');
+                }, 5000);
             }
         }
 
@@ -491,6 +574,9 @@
                     clearInterval(countdownInterval);
                 }
             }, 1000);
+
+            // Show floating popup after a brief delay
+            setTimeout(showFloatingPopup, 1000);
 
             // Set redirect timer
             redirectTimer = setTimeout(() => {
