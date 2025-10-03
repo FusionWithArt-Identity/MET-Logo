@@ -588,9 +588,12 @@
                 const dx = e.clientX - startX;
                 const dy = e.clientY - startY;
                 
-                // Calculate new position with boundaries
-                const newX = Math.max(0, Math.min(window.innerWidth - stamp.offsetWidth, initialX + dx));
-                const newY = Math.max(0, Math.min(window.innerHeight - stamp.offsetHeight, initialY + dy));
+                // Calculate new position with boundaries - PREVENT DRAGGING OUTSIDE VIEWPORT
+                const maxX = window.innerWidth - stamp.offsetWidth;
+                const maxY = window.innerHeight - stamp.offsetHeight;
+                
+                const newX = Math.max(0, Math.min(maxX, initialX + dx));
+                const newY = Math.max(0, Math.min(maxY, initialY + dy));
                 
                 stamp.style.left = newX + 'px';
                 stamp.style.top = newY + 'px';
@@ -618,26 +621,36 @@
                         element: popup,
                         autoHide: options.autoHide !== false,
                         duration: options.duration || 5000,
-                        timer: null
+                        timer: null,
+                        delay: options.delay || 0,
+                        delayTimer: null
                     };
                 }
             },
             
-            // Show specific popup
+            // Show specific popup with delay
             show: function(popupId) {
                 const popupData = this.popups[popupId];
                 if (popupData && !this.isRedirecting) {
-                    popupData.element.classList.add('show');
-                    
-                    // Auto hide after duration
-                    if (popupData.autoHide) {
-                        if (popupData.timer) {
-                            clearTimeout(popupData.timer);
-                        }
-                        popupData.timer = setTimeout(() => {
-                            this.hide(popupId);
-                        }, popupData.duration);
+                    // Clear any existing timers
+                    if (popupData.delayTimer) {
+                        clearTimeout(popupData.delayTimer);
                     }
+                    if (popupData.timer) {
+                        clearTimeout(popupData.timer);
+                    }
+                    
+                    // Apply delay before showing
+                    popupData.delayTimer = setTimeout(() => {
+                        popupData.element.classList.add('show');
+                        
+                        // Auto hide after duration
+                        if (popupData.autoHide) {
+                            popupData.timer = setTimeout(() => {
+                                this.hide(popupId);
+                            }, popupData.duration);
+                        }
+                    }, popupData.delay);
                 }
             },
             
@@ -648,6 +661,9 @@
                     popupData.element.classList.remove('show');
                     if (popupData.timer) {
                         clearTimeout(popupData.timer);
+                    }
+                    if (popupData.delayTimer) {
+                        clearTimeout(popupData.delayTimer);
                     }
                 }
             },
@@ -702,7 +718,7 @@
                 userReturned = true;
                 // User came back to the page - cancel auto redirect and hide redirect message
                 hideRedirectMessage();
-                // Show the popup balloon immediately
+                // Show the popup balloon with delay
                 PopUpSystem.show('PopUp1-About-Me');
             }
         }
@@ -741,11 +757,26 @@
             // Initialize stamp dragging
             initStampDragging();
             
-            // Initialize the About-Me popup
+            // Initialize the About-Me popup with 2 second delay
             PopUpSystem.init('PopUp1-About-Me', {
                 autoHide: true,
-                duration: 5000
+                duration: 5000,
+                delay: 2000 // 2 second delay before showing
             });
+            
+            // Show popup after initialization (if not redirecting)
+            if (!PopUpSystem.isRedirecting) {
+                PopUpSystem.show('PopUp1-About-Me');
+            }
+        });
+
+        // Close popup when user clicks/touches anywhere on the screen
+        document.addEventListener('click', function() {
+            PopUpSystem.hideAll();
+        });
+        
+        document.addEventListener('touchstart', function() {
+            PopUpSystem.hideAll();
         });
 
         // Check if page was hidden (user navigated away) and is now visible again
