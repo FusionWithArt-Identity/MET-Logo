@@ -528,7 +528,6 @@
         let popupTimer;
         let redirectStarted = false;
         let userReturned = false;
-        let userInteracted = false;
         let intermittentPopupInterval;
 
         // Function to hide redirect message
@@ -565,7 +564,7 @@
                 clearInterval(intermittentPopupInterval);
             }
             
-            // Show popup immediately when user returns
+            // Show popup immediately
             showFloatingPopup();
             
             // Then show every 6 seconds
@@ -582,6 +581,13 @@
             }
             if (floatingPopup) {
                 floatingPopup.classList.remove('show');
+            }
+        }
+
+        // Function to handle user interactions
+        function handleUserInteraction() {
+            if (userReturned && !hasRedirected) {
+                startIntermittentPopup();
             }
         }
 
@@ -609,73 +615,39 @@
                 stopIntermittentPopup();
                 window.location.href = targetURL;
             }, redirectDelay);
-
-            // Check if redirect failed after the redirect time + buffer
-            setTimeout(() => {
-                if (!hasRedirected && redirectStarted) {
-                    // Redirect failed - start intermittent popup
-                    startIntermittentPopup();
-                }
-            }, redirectDelay + 500);
         }
 
-        // User interaction detection
-        function handleUserInteraction() {
-            if (!userInteracted && userReturned && !hasRedirected) {
-                userInteracted = true;
+        // Check if user is returning to the page
+        function checkIfUserReturned() {
+            // If page load time exceeds redirect delay, user likely navigated back
+            if (performance.now() > redirectDelay && !hasRedirected) {
+                userReturned = true;
+                hideRedirectMessage();
+                
+                // Start intermittent popup immediately when user returns
                 startIntermittentPopup();
+                
+                // Also start on user interactions
+                document.addEventListener('click', handleUserInteraction);
+                document.addEventListener('touchstart', handleUserInteraction);
+                document.addEventListener('scroll', handleUserInteraction);
             }
         }
 
-        // Check if page was hidden (user navigated away) and is now visible again
+        // Check page visibility changes
         document.addEventListener('visibilitychange', function() {
             if (document.visibilityState === 'visible') {
-                // Page became visible again - user likely navigated back
-                // Check if enough time has passed for the redirect to have occurred
-                if (performance.now() > redirectDelay) {
-                    userReturned = true;
-                    hideRedirectMessage();
-                    
-                    // Start intermittent popup when user interacts
-                    document.addEventListener('click', handleUserInteraction, { once: true });
-                    document.addEventListener('touchstart', handleUserInteraction, { once: true });
-                    document.addEventListener('scroll', handleUserInteraction, { once: true });
-                    
-                    // Also start if user doesn't interact within 2 seconds
-                    setTimeout(() => {
-                        if (!userInteracted && !hasRedirected) {
-                            startIntermittentPopup();
-                        }
-                    }, 2000);
-                }
+                // Page became visible - user might have navigated back
+                setTimeout(checkIfUserReturned, 100);
             } else {
                 // Page hidden - stop popups
                 stopIntermittentPopup();
             }
         });
 
-        // Also check page load time to see if user is returning
+        // Check on page load
         window.addEventListener('load', function() {
-            // If page takes more than redirectDelay to load, user probably navigated back
-            setTimeout(() => {
-                if (document.visibilityState === 'visible' && !hasRedirected && redirectStarted) {
-                    userReturned = true;
-                    // User likely navigated back after redirect would have completed
-                    hideRedirectMessage();
-                    
-                    // Start intermittent popup when user interacts
-                    document.addEventListener('click', handleUserInteraction, { once: true });
-                    document.addEventListener('touchstart', handleUserInteraction, { once: true });
-                    document.addEventListener('scroll', handleUserInteraction, { once: true });
-                    
-                    // Also start if user doesn't interact within 2 seconds
-                    setTimeout(() => {
-                        if (!userInteracted && !hasRedirected) {
-                            startIntermittentPopup();
-                        }
-                    }, 2000);
-                }
-            }, redirectDelay + 100);
+            setTimeout(checkIfUserReturned, redirectDelay + 100);
         });
 
         // Start the redirect process
@@ -706,8 +678,6 @@
             e.preventDefault();
             return false;
         });
-        
-        // Removed all previous, performance-damaging JS for orientation and resize to ensure fluidity.
         
     </script>
 </body>
