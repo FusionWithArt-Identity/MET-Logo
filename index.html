@@ -123,7 +123,7 @@
         }
         
         /* -----------------------------------
-            Stamp Image in Corner
+            Stamp Image in Corner - Enhanced with Dragging
             ----------------------------------- */
         .stamp {
             position: fixed;
@@ -138,6 +138,27 @@
             /* Performance optimization */
             will-change: transform;
             transform: translateZ(0);
+            /* Dragging enabled for desktop */
+            cursor: grab;
+            transition: transform 0.2s ease, filter 0.2s ease;
+        }
+
+        .stamp:active {
+            cursor: grabbing;
+            transform: rotate(25deg) scale(1.05);
+            filter: drop-shadow(0 0 8px rgba(0, 121, 107, 0.7));
+        }
+
+        /* Disable dragging on mobile devices */
+        @media (max-width: 768px) {
+            .stamp {
+                cursor: default;
+            }
+            .stamp:active {
+                cursor: default;
+                transform: rotate(25deg);
+                filter: drop-shadow(0 0 5px rgba(0, 121, 107, 0.5));
+            }
         }
         
         /* Responsive stamp sizing */
@@ -401,28 +422,39 @@
             font-weight: bold;
         }
 
-        /* NEW: Enhanced Floating Popup System */
+        /* NEW: Enhanced Compact Floating Popup System */
         .popup-balloon {
             position: absolute;
             bottom: 100%;
             left: 50%;
             transform: translateX(-50%);
-            background: #424242; /* Grey background */
+            background: rgba(66, 66, 66, 0.85); /* Transparent grey background */
             color: #ffffff; /* White text */
-            padding: 10px 14px;
-            border-radius: 10px;
-            font-size: 0.75rem;
-            width: 240px;
-            margin-bottom: 6px;
-            backdrop-filter: blur(5px);
-            border: 1px solid #616161;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            padding: 6px 10px; /* More compact padding */
+            border-radius: 8px;
+            font-size: 0.7rem; /* Slightly smaller font */
+            width: 200px; /* More compact width */
+            margin-bottom: 4px;
+            backdrop-filter: blur(10px); /* Enhanced blur for transparency */
+            border: 1px solid rgba(97, 97, 97, 0.6);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             opacity: 0;
             visibility: hidden;
             transition: all 0.3s ease;
             z-index: 5;
             text-align: center;
-            line-height: 1.4;
+            line-height: 1.3;
+            /* Floating animation */
+            animation: floatBalloon 3s ease-in-out infinite;
+        }
+
+        @keyframes floatBalloon {
+            0%, 100% {
+                transform: translateX(-50%) translateY(0px);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-3px);
+            }
         }
 
         .popup-balloon::after {
@@ -431,9 +463,9 @@
             top: 100%;
             left: 50%;
             transform: translateX(-50%);
-            border-width: 6px;
+            border-width: 5px;
             border-style: solid;
-            border-color: #424242 transparent transparent transparent;
+            border-color: rgba(66, 66, 66, 0.85) transparent transparent transparent;
         }
 
         .popup-balloon.show {
@@ -466,7 +498,7 @@
         <img src="Stamp.png" alt="Preload Stamp">
     </div>
 
-    <img src="Stamp.png" alt="Stamp" class="stamp">
+    <img src="Stamp.png" alt="Stamp" class="stamp" id="draggableStamp">
 
     <div class="content-container">
         <div class="logo-container">
@@ -514,6 +546,63 @@
         
         // Also preload immediately
         preloadImages();
+
+        /* -----------------------------------
+            Enhanced Stamp Dragging Functionality
+            ----------------------------------- */
+        function initStampDragging() {
+            const stamp = document.getElementById('draggableStamp');
+            if (!stamp) return;
+
+            let isDragging = false;
+            let startX, startY, initialX, initialY;
+
+            // Check if device is mobile
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+            if (isMobile) {
+                // Disable dragging on mobile
+                stamp.style.cursor = 'default';
+                return;
+            }
+
+            // Desktop dragging functionality
+            stamp.addEventListener('mousedown', startDrag);
+            document.addEventListener('mousemove', drag);
+            document.addEventListener('mouseup', stopDrag);
+
+            function startDrag(e) {
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                initialX = stamp.offsetLeft;
+                initialY = stamp.offsetTop;
+                stamp.style.transition = 'none';
+            }
+
+            function drag(e) {
+                if (!isDragging) return;
+                
+                e.preventDefault();
+                
+                const dx = e.clientX - startX;
+                const dy = e.clientY - startY;
+                
+                // Calculate new position with boundaries
+                const newX = Math.max(0, Math.min(window.innerWidth - stamp.offsetWidth, initialX + dx));
+                const newY = Math.max(0, Math.min(window.innerHeight - stamp.offsetHeight, initialY + dy));
+                
+                stamp.style.left = newX + 'px';
+                stamp.style.top = newY + 'px';
+                stamp.style.right = 'auto';
+            }
+
+            function stopDrag() {
+                if (!isDragging) return;
+                isDragging = false;
+                stamp.style.transition = 'transform 0.2s ease, filter 0.2s ease';
+            }
+        }
 
         /* -----------------------------------
             Enhanced Popup Balloon System
@@ -647,8 +736,11 @@
             }, redirectDelay);
         }
 
-        // Initialize popup system when DOM is loaded
+        // Initialize when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize stamp dragging
+            initStampDragging();
+            
             // Initialize the About-Me popup
             PopUpSystem.init('PopUp1-About-Me', {
                 autoHide: true,
