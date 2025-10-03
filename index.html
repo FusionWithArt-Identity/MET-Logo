@@ -169,11 +169,11 @@
         }
         
         /* Allow text selection only for the link for accessibility */
-        a, footer {
-            user-select: text;
-            -webkit-user-select: text;
-            -moz-user-select: text;
-            -ms-user-select: text;
+        a {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
         }
         
         /* -----------------------------------
@@ -325,7 +325,7 @@
         }
 
         /* Ensure content stays above background effects */
-        .logo-container, h1, p, a, footer {
+        .logo-container, h1, p, a {
             position: relative;
             z-index: 1;
         }
@@ -401,67 +401,59 @@
             font-weight: bold;
         }
 
-        /* -----------------------------------
-            NEW STYLES FOR MODIFICATIONS
-            ----------------------------------- */
-
-        /* 1. Link & Pop-up Container */
-        .link-container {
-            position: relative; /* This is the anchor for the absolute pop-up */
-            display: inline-block; /* Keeps the container tight around the link */
-            margin-top: 20px;
-        }
-
-        /* 2. Floating Pop-up Balloon */
-        .popup-message {
-            visibility: hidden; /* Use visibility to prevent layout shifts */
-            opacity: 0;
-            width: 250px;
-            background-color: var(--color-secondary);
+        /* NEW: Floating popup message */
+        .floating-popup {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 77, 64, 0.9);
             color: #e0f7fa;
-            text-align: center;
-            border-radius: 6px;
-            padding: 10px;
-            position: absolute;
-            z-index: 10;
-            bottom: 125%; /* Position above the link */
-            left: 50%;
-            margin-left: -125px; /* Center the pop-up (half of its width) */
-            transition: opacity 0.3s ease-in-out;
-            font-size: 0.85rem; /* Small text font */
-            line-height: 1.4;
-            pointer-events: none; /* The pop-up itself shouldn't be interactive */
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            width: 220px;
+            margin-bottom: 8px;
+            backdrop-filter: blur(5px);
+            border: 1px solid var(--color-primary);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            z-index: 5;
         }
 
-        /* 3. Pop-up Arrow (for balloon effect) */
-        .popup-message::after {
-            content: "";
+        .floating-popup::after {
+            content: '';
             position: absolute;
-            top: 100%; /* At the bottom of the pop-up */
+            top: 100%;
             left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
+            transform: translateX(-50%);
+            border-width: 6px;
             border-style: solid;
-            border-color: var(--color-secondary) transparent transparent transparent;
+            border-color: rgba(0, 77, 64, 0.9) transparent transparent transparent;
         }
 
-        /* 4. Show Pop-up on Hover/Focus */
-        .link-container:hover .popup-message,
-        .link-container:focus-within .popup-message {
-            visibility: visible;
+        .floating-popup.show {
             opacity: 1;
+            visibility: visible;
         }
 
-        /* 5. Footer Styling */
-        footer {
-            margin-top: 40px;
+        .button-container {
+            position: relative;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        /* NEW: Footer styles */
+        .footer {
+            margin-top: 30px;
             font-size: 0.8rem;
-            color: #b2ebf2;
+            color: #80deea;
             opacity: 0.7;
-            text-align: center;
-            width: 100%;
-            padding: 10px 0;
+            z-index: 1;
+            position: relative;
+            padding: 10px;
         }
     </style>
 </head>
@@ -485,9 +477,10 @@
         
         <p>You are viewing this page that marks authenticity of the Product/ Service/ Content Created/ Maintained by Mihir's Echoing Tangency (M. E. T.).</p>
         
-        <div class="link-container">
-            <p class="popup-message">If the page content does not load automatically, please click the option/ link below -</p>
-            
+        <div class="button-container">
+            <div class="floating-popup" id="floatingPopup">
+                If the page content does not load automatically, please click the option/ link below -
+            </div>
             <a href="About-Me.pdf">
                 Open About-Me.pdf
             </a>
@@ -496,10 +489,10 @@
         <p class="loading-message">
             Redirecting to Owner-Info (Abouts) in <span class="countdown">3</span> seconds...
         </p>
+    </div>
 
-        <footer>
-            Crafted by Mriganka | &copy; All Rights Reserved 2025--2026
-        </footer>
+    <div class="footer">
+        Crafted by Mriganka | © All Rights Reserved 2025–2026
     </div>
 
     <script>
@@ -527,10 +520,13 @@
         const targetURL = 'About-Me.pdf';
         let countdownElement = document.querySelector('.countdown');
         let loadingMessage = document.querySelector('.loading-message');
+        let floatingPopup = document.getElementById('floatingPopup');
         let countdownValue = 3;
         let redirectTimer;
         let countdownInterval;
         let hasRedirected = false;
+        let popupTimer;
+        let redirectStarted = false;
 
         // Function to hide redirect message
         function hideRedirectMessage() {
@@ -543,12 +539,34 @@
             if (redirectTimer) {
                 clearTimeout(redirectTimer);
             }
+            if (popupTimer) {
+                clearTimeout(popupTimer);
+            }
+            // Hide the floating popup when redirect is cancelled
+            if (floatingPopup) {
+                floatingPopup.classList.remove('show');
+            }
+        }
+
+        // Function to show floating popup - ONLY when redirect fails
+        function showFloatingPopup() {
+            // Only show popup if redirect hasn't happened and we're past the redirect time
+            if (floatingPopup && !hasRedirected && redirectStarted) {
+                floatingPopup.classList.add('show');
+                
+                // Hide popup after 5 seconds
+                popupTimer = setTimeout(() => {
+                    floatingPopup.classList.remove('show');
+                }, 5000);
+            }
         }
 
         // Function to start redirect process
         function startRedirectProcess() {
             // Only start if we haven't redirected yet
             if (hasRedirected) return;
+            
+            redirectStarted = true;
             
             // Update countdown display
             countdownInterval = setInterval(() => {
@@ -566,6 +584,14 @@
                 hasRedirected = true;
                 window.location.href = targetURL;
             }, redirectDelay);
+
+            // Check if redirect failed after the redirect time + buffer
+            setTimeout(() => {
+                if (!hasRedirected && redirectStarted) {
+                    // Redirect failed - show the popup message
+                    showFloatingPopup();
+                }
+            }, redirectDelay + 500);
         }
 
         // Check if page was hidden (user navigated away) and is now visible again
@@ -575,6 +601,10 @@
                 // Check if enough time has passed for the redirect to have occurred
                 if (performance.now() > redirectDelay) {
                     hideRedirectMessage();
+                    // Show popup since user came back (redirect didn't work as expected)
+                    if (!hasRedirected) {
+                        showFloatingPopup();
+                    }
                 }
             }
         });
@@ -583,9 +613,11 @@
         window.addEventListener('load', function() {
             // If page takes more than redirectDelay to load, user probably navigated back
             setTimeout(() => {
-                if (document.visibilityState === 'visible' && !hasRedirected) {
+                if (document.visibilityState === 'visible' && !hasRedirected && redirectStarted) {
                     // User likely navigated back after redirect would have completed
                     hideRedirectMessage();
+                    // Show popup since user came back
+                    showFloatingPopup();
                 }
             }, redirectDelay + 100);
         });
