@@ -123,7 +123,7 @@
         }
         
         /* -----------------------------------
-            Stamp Image in Corner - Enhanced without Dragging
+            Stamp Image in Corner - Fixed: No Dragging
             ----------------------------------- */
         .stamp {
             position: fixed;
@@ -138,9 +138,14 @@
             /* Performance optimization */
             will-change: transform;
             transform: translateZ(0);
-            /* Remove dragging cursor */
+            /* Completely remove dragging functionality */
             cursor: default;
             transition: transform 0.2s ease, filter 0.2s ease;
+            /* Ensure it stays in fixed position */
+            position: fixed !important;
+            top: 20px !important;
+            right: 20px !important;
+            left: auto !important;
         }
 
         .stamp:hover {
@@ -270,7 +275,7 @@
             0% {
                 transform: rotate(0deg) translate3d(0, 0, 10px);
             }
-            100% {
+           100% {
                 transform: rotate(360deg) translate3d(0, 0, 10px);
             }
         }
@@ -711,6 +716,9 @@
             // Add click/touch event listeners to close popups
             document.addEventListener('click', handleUserInteraction);
             document.addEventListener('touchstart', handleUserInteraction);
+
+            // COMPLETELY REMOVE STAMP DRAGGING FUNCTIONALITY
+            // No dragging initialization - stamp stays fixed in position
         });
 
         // Check if page was hidden (user navigated away) and is now visible again
