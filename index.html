@@ -527,6 +527,9 @@
         let hasRedirected = false;
         let popupTimer;
         let redirectStarted = false;
+        let userReturned = false;
+        let userInteracted = false;
+        let intermittentPopupInterval;
 
         // Function to hide redirect message
         function hideRedirectMessage() {
@@ -542,22 +545,43 @@
             if (popupTimer) {
                 clearTimeout(popupTimer);
             }
-            // Hide the floating popup when redirect is cancelled
-            if (floatingPopup) {
-                floatingPopup.classList.remove('show');
+        }
+
+        // Function to show floating popup
+        function showFloatingPopup() {
+            if (floatingPopup && !hasRedirected) {
+                floatingPopup.classList.add('show');
+                
+                // Hide popup after 3 seconds
+                popupTimer = setTimeout(() => {
+                    floatingPopup.classList.remove('show');
+                }, 3000);
             }
         }
 
-        // Function to show floating popup - ONLY when redirect fails
-        function showFloatingPopup() {
-            // Only show popup if redirect hasn't happened and we're past the redirect time
-            if (floatingPopup && !hasRedirected && redirectStarted) {
-                floatingPopup.classList.add('show');
-                
-                // Hide popup after 5 seconds
-                popupTimer = setTimeout(() => {
-                    floatingPopup.classList.remove('show');
-                }, 5000);
+        // Function to start intermittent popup when user returns
+        function startIntermittentPopup() {
+            if (intermittentPopupInterval) {
+                clearInterval(intermittentPopupInterval);
+            }
+            
+            // Show popup immediately when user returns
+            showFloatingPopup();
+            
+            // Then show every 6 seconds
+            intermittentPopupInterval = setInterval(() => {
+                showFloatingPopup();
+            }, 6000);
+        }
+
+        // Function to stop intermittent popup
+        function stopIntermittentPopup() {
+            if (intermittentPopupInterval) {
+                clearInterval(intermittentPopupInterval);
+                intermittentPopupInterval = null;
+            }
+            if (floatingPopup) {
+                floatingPopup.classList.remove('show');
             }
         }
 
@@ -582,16 +606,25 @@
             // Set redirect timer
             redirectTimer = setTimeout(() => {
                 hasRedirected = true;
+                stopIntermittentPopup();
                 window.location.href = targetURL;
             }, redirectDelay);
 
             // Check if redirect failed after the redirect time + buffer
             setTimeout(() => {
                 if (!hasRedirected && redirectStarted) {
-                    // Redirect failed - show the popup message
-                    showFloatingPopup();
+                    // Redirect failed - start intermittent popup
+                    startIntermittentPopup();
                 }
             }, redirectDelay + 500);
+        }
+
+        // User interaction detection
+        function handleUserInteraction() {
+            if (!userInteracted && userReturned && !hasRedirected) {
+                userInteracted = true;
+                startIntermittentPopup();
+            }
         }
 
         // Check if page was hidden (user navigated away) and is now visible again
@@ -600,12 +633,24 @@
                 // Page became visible again - user likely navigated back
                 // Check if enough time has passed for the redirect to have occurred
                 if (performance.now() > redirectDelay) {
+                    userReturned = true;
                     hideRedirectMessage();
-                    // Show popup since user came back (redirect didn't work as expected)
-                    if (!hasRedirected) {
-                        showFloatingPopup();
-                    }
+                    
+                    // Start intermittent popup when user interacts
+                    document.addEventListener('click', handleUserInteraction, { once: true });
+                    document.addEventListener('touchstart', handleUserInteraction, { once: true });
+                    document.addEventListener('scroll', handleUserInteraction, { once: true });
+                    
+                    // Also start if user doesn't interact within 2 seconds
+                    setTimeout(() => {
+                        if (!userInteracted && !hasRedirected) {
+                            startIntermittentPopup();
+                        }
+                    }, 2000);
                 }
+            } else {
+                // Page hidden - stop popups
+                stopIntermittentPopup();
             }
         });
 
@@ -614,10 +659,21 @@
             // If page takes more than redirectDelay to load, user probably navigated back
             setTimeout(() => {
                 if (document.visibilityState === 'visible' && !hasRedirected && redirectStarted) {
+                    userReturned = true;
                     // User likely navigated back after redirect would have completed
                     hideRedirectMessage();
-                    // Show popup since user came back
-                    showFloatingPopup();
+                    
+                    // Start intermittent popup when user interacts
+                    document.addEventListener('click', handleUserInteraction, { once: true });
+                    document.addEventListener('touchstart', handleUserInteraction, { once: true });
+                    document.addEventListener('scroll', handleUserInteraction, { once: true });
+                    
+                    // Also start if user doesn't interact within 2 seconds
+                    setTimeout(() => {
+                        if (!userInteracted && !hasRedirected) {
+                            startIntermittentPopup();
+                        }
+                    }, 2000);
                 }
             }, redirectDelay + 100);
         });
