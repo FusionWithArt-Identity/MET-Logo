@@ -575,8 +575,8 @@
                 isDragging = true;
                 startX = e.clientX;
                 startY = e.clientY;
-                initialX = stamp.offsetLeft;
-                initialY = stamp.offsetTop;
+                initialX = parseFloat(stamp.style.left) || stamp.offsetLeft;
+                initialY = parseFloat(stamp.style.top) || stamp.offsetTop;
                 stamp.style.transition = 'none';
             }
 
@@ -588,10 +588,15 @@
                 const dx = e.clientX - startX;
                 const dy = e.clientY - startY;
                 
-                // Calculate new position with boundaries - PREVENT DRAGGING OUTSIDE VIEWPORT
-                const maxX = window.innerWidth - stamp.offsetWidth;
-                const maxY = window.innerHeight - stamp.offsetHeight;
+                // Calculate new position with STRICT boundaries - PREVENT DRAGGING OUTSIDE VISIBLE AREA
+                const stampWidth = stamp.offsetWidth;
+                const stampHeight = stamp.offsetHeight;
                 
+                // Use document.body for boundaries instead of window
+                const maxX = document.body.clientWidth - stampWidth;
+                const maxY = document.body.clientHeight - stampHeight;
+                
+                // Ensure stamp stays completely within body boundaries
                 const newX = Math.max(0, Math.min(maxX, initialX + dx));
                 const newY = Math.max(0, Math.min(maxY, initialY + dy));
                 
@@ -604,6 +609,20 @@
                 if (!isDragging) return;
                 isDragging = false;
                 stamp.style.transition = 'transform 0.2s ease, filter 0.2s ease';
+                
+                // Ensure final position is within bounds
+                const stampWidth = stamp.offsetWidth;
+                const stampHeight = stamp.offsetHeight;
+                const maxX = document.body.clientWidth - stampWidth;
+                const maxY = document.body.clientHeight - stampHeight;
+                
+                const currentX = parseFloat(stamp.style.left);
+                const currentY = parseFloat(stamp.style.top);
+                
+                if (currentX < 0) stamp.style.left = '0px';
+                if (currentY < 0) stamp.style.top = '0px';
+                if (currentX > maxX) stamp.style.left = maxX + 'px';
+                if (currentY > maxY) stamp.style.top = maxY + 'px';
             }
         }
 
